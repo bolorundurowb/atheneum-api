@@ -4,7 +4,6 @@ import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { UsersService } from './users/users.service';
 import { UsersModule } from './users/users.module';
 import { BooksModule } from './books/books.module';
 
@@ -17,6 +16,7 @@ import { BooksModule } from './books/books.module';
     BooksModule,
   ],
   controllers: [AppController],
-  providers: [AppService, UsersService],
+  providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+}
