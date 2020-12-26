@@ -5,6 +5,11 @@ import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModal: Model<UserDocument>) {
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+
+  async findByEmail(emailAddress: string): Promise<User | undefined> {
+    return this.userModel.findOne({
+      emailAddress,
+    });
   }
 }
