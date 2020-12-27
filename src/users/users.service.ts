@@ -12,4 +12,12 @@ export class UsersService {
       emailAddress,
     });
   }
+
+  async create(emailAddress: string, password: string): Promise<User> {
+    const user = new this.userModel({
+      emailAddress: emailAddress,
+      passwordHash: password,
+    });
+    return await user.save();
+  }
 }

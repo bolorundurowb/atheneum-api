@@ -22,6 +22,14 @@ export class AuthController {
     );
   }
 
+  @Post('register')
+  async register(@Body() credentials: CredentialsDto) {
+    return this.authService.register(
+      credentials.emailAddress,
+      credentials.password,
+    );
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
