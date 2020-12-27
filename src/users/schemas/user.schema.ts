@@ -5,11 +5,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import * as bcrypt from 'bcrypt';
+import * as shortId from 'shortid';
 
 export type UserDocument = User & Document;
 
 @Schema()
 export class User {
+  @Prop({ default: shortId.generate })
+  _id: string;
+
   @Prop()
   firstName: string;
 
