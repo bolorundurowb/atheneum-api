@@ -13,11 +13,15 @@ export class UsersService {
     });
   }
 
+  async findById(userId: string): Promise<User | undefined> {
+    return this.userModel.findById(userId);
+  }
+
   async create(emailAddress: string, password: string): Promise<User> {
     const user = new this.userModel({
       emailAddress: emailAddress,
       passwordHash: password,
     });
-    return await user.save();
+    return user.save();
   }
 }

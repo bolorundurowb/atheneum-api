@@ -7,6 +7,7 @@ import { Document } from 'mongoose';
 import * as mongoose from 'mongoose';
 import { User } from '../../users/schemas/user.schema';
 import { Author } from './author.schema';
+import { Publisher } from './publisher.schema';
 
 export type BookDocument = Book & Document;
 
@@ -38,6 +39,9 @@ export class Book {
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Author' }] })
   authors: Array<Author>;
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Publisher' })
+  publisher: Publisher;
 }
 
 export const BookSchema = SchemaFactory.createForClass(Book);

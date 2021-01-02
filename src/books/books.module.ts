@@ -6,12 +6,14 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Book, BookSchema } from './schemas/book.schema';
 import { Author, AuthorSchema } from './schemas/author.schema';
 import { Publisher, PublisherSchema } from './schemas/publisher.schema';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   providers: [BooksService, IsbnService],
   controllers: [BooksController],
   imports: [
     HttpModule,
+    UsersModule,
     MongooseModule.forFeature([
       { name: Book.name, schema: BookSchema },
       { name: Author.name, schema: AuthorSchema },
