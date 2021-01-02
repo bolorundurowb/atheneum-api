@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -8,8 +12,7 @@ export class AuthService {
   constructor(
     private userService: UsersService,
     private jwtService: JwtService,
-  ) {
-  }
+  ) {}
 
   async login(emailAddress: string, password: string): Promise<any> {
     const user = await this.userService.findByEmail(emailAddress);
@@ -22,14 +25,14 @@ export class AuthService {
       };
     }
 
-    throw new UnauthorizedException(user, 'User account not found.');
+    throw new UnauthorizedException(null, 'User account not found.');
   }
 
   async register(emailAddress: string, password: string): Promise<any> {
     let user = await this.userService.findByEmail(emailAddress);
 
     if (user) {
-      throw new ConflictException(user, 'User account already exists.');
+      throw new ConflictException(null, 'User account already exists.');
     }
 
     user = await this.userService.create(emailAddress, password);
