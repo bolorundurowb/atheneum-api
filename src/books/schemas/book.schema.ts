@@ -13,7 +13,13 @@ export type BookDocument = Book & Document;
 @Schema()
 export class Book {
   @Prop({ required: true })
+  externalId: string;
+
+  @Prop({ required: true })
   title: string;
+
+  @Prop()
+  summary: string;
 
   @Prop()
   isbn: string;
@@ -22,22 +28,16 @@ export class Book {
   isbn13: string;
 
   @Prop()
-  year: number;
-
-  @Prop()
-  summary: string;
-
-  @Prop()
   coverArt: string;
 
   @Prop()
-  publishedAt: Date;
+  publishYear: number;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   owner: User;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Author' }] })
-  authors: Author[];
+  authors: Array<Author>;
 }
 
 export const BookSchema = SchemaFactory.createForClass(Book);

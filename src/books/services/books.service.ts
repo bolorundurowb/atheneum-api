@@ -1,4 +1,4 @@
-import { HttpService, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { IsbnService } from './isbn.service';
 
 @Injectable()
@@ -8,5 +8,7 @@ export class BooksService {
   constructor(private isbnService: IsbnService) {
   }
 
+async addByIsbn(isbn: string): Promise<any> {
 
+}
 }
