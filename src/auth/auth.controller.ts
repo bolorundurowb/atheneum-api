@@ -1,13 +1,9 @@
 import {
   Controller,
   Post,
-  UseGuards,
-  Request,
-  Get,
   Body,
 } from '@nestjs/common';
 import { AuthService } from './services/auth.service';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CredentialsDto } from './dtos/credentials.dto';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -30,11 +26,5 @@ export class AuthController {
       credentials.emailAddress,
       credentials.password,
     );
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
   }
 }
