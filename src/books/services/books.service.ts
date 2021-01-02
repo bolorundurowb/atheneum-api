@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { IsbnService } from './isbn.service';
 
 @Injectable()
@@ -8,7 +8,13 @@ export class BooksService {
   constructor(private isbnService: IsbnService) {
   }
 
-async addByIsbn(isbn: string): Promise<any> {
+  async addByIsbn(isbn: string): Promise<any> {
+    const bookInfo = await this.isbnService.getBookByIsbn(isbn);
 
-}
+    if (!bookInfo) {
+      throw new NotFoundException(null, 'A book with the provided ISBN does not exist.');
+    }
+
+// const book =
+  }
 }

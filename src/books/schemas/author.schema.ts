@@ -16,4 +16,4 @@ export class Author {
   lastName: string;
 }
 
-export const UserSchema = SchemaFactory.createForClass(Author);
+export const AuthorSchema = SchemaFactory.createForClass(Author);
