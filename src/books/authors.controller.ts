@@ -5,17 +5,17 @@
 import { Controller, Get, Request, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { PublisherService } from './services/publisher.service';
+import { AuthorService } from './services/author.service';
 
-@ApiTags('Publishers')
+@ApiTags('Authors')
 @UseGuards(JwtAuthGuard)
-@Controller('publishers')
-export class PublishersController {
-  constructor(private publisherService: PublisherService) {}
+@Controller('authors')
+export class AuthorsController {
+  constructor(private authorService: AuthorService) {}
 
   @Get()
   async getAll(@Request() req) {
     const userId = req.user.id;
-    return this.publisherService.getAll(userId);
+    return this.authorService.getAll(userId);
   }
 }

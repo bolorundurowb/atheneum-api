@@ -9,10 +9,12 @@ import { Publisher, PublisherSchema } from './schemas/publisher.schema';
 import { UsersModule } from '../users/users.module';
 import { PublishersController } from './publishers.controller';
 import { PublisherService } from './services/publisher.service';
+import { AuthorService } from './services/author.service';
+import { AuthorsController } from './authors.controller';
 
 @Module({
-  providers: [BooksService, IsbnService, PublisherService],
-  controllers: [BooksController, PublishersController],
+  providers: [BooksService, IsbnService, PublisherService, AuthorService],
+  controllers: [BooksController, PublishersController, AuthorsController],
   imports: [
     HttpModule,
     UsersModule,
