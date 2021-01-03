@@ -1,7 +1,6 @@
 import {
   ConflictException,
   Injectable,
-  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -16,8 +15,6 @@ import { BookManualDto } from '../dtos/book-manual.dto';
 
 @Injectable()
 export class BooksService {
-  private readonly logger = new Logger(BooksService.name);
-
   constructor(
     private isbnService: IsbnService,
     private userService: UsersService,
@@ -25,8 +22,7 @@ export class BooksService {
     @InjectModel(Author.name) private authorModel: Model<AuthorDocument>,
     @InjectModel(Publisher.name)
     private publisherModel: Model<PublisherDocument>,
-  ) {
-  }
+  ) {}
 
   async getAll(ownerId: any): Promise<Array<any>> {
     return this.bookModel

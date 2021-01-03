@@ -49,7 +49,7 @@ export class AuthService {
     return this.jwtService.sign({
       email: user.emailAddress,
       id: user._id,
-      sub: uuid()
+      sub: uuid(),
     });
   }
 }

@@ -5,7 +5,8 @@ import {
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiOkResponse,
-  ApiTags, ApiUnauthorizedResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { AuthDto } from './dtos/auth.dto';
 
