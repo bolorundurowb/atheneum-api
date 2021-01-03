@@ -13,7 +13,7 @@ export type BookDocument = Book & Document;
 
 @Schema()
 export class Book {
-  @Prop({ required: true })
+  @Prop()
   externalId: string;
 
   @Prop({ required: true })
