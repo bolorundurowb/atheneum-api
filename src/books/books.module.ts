@@ -7,10 +7,12 @@ import { Book, BookSchema } from './schemas/book.schema';
 import { Author, AuthorSchema } from './schemas/author.schema';
 import { Publisher, PublisherSchema } from './schemas/publisher.schema';
 import { UsersModule } from '../users/users.module';
+import { PublishersController } from './publishers.controller';
+import { PublisherService } from './services/publisher.service';
 
 @Module({
-  providers: [BooksService, IsbnService],
-  controllers: [BooksController],
+  providers: [BooksService, IsbnService, PublisherService],
+  controllers: [BooksController, PublishersController],
   imports: [
     HttpModule,
     UsersModule,

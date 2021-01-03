@@ -55,6 +55,7 @@ export class BooksService {
 
     // find the publisher or create if they dont exist
     let publisher = await this.publisherModel.findOne({
+      owner,
       name: {
         $regex: bookInfo.publisher,
         $options: 'i',
@@ -63,6 +64,7 @@ export class BooksService {
 
     if (!publisher) {
       publisher = new this.publisherModel({
+        owner,
         name: bookInfo.publisher,
       });
       await publisher.save();
@@ -73,6 +75,7 @@ export class BooksService {
 
     for (const authorName of bookInfo.authors) {
       let author = await this.authorModel.findOne({
+        owner,
         name: {
           $regex: authorName,
           $options: 'i',
@@ -81,6 +84,7 @@ export class BooksService {
 
       if (!author) {
         author = new this.authorModel({
+          owner,
           name: authorName,
         });
         await author.save();
