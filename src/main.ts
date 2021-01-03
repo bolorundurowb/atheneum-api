@@ -11,7 +11,6 @@ async function bootstrap() {
     .setTitle('Atheneum API')
     .setDescription('The API for the atheneum app')
     .setVersion('1.0')
-    .addTag('library')
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
