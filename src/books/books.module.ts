@@ -11,13 +11,11 @@ import { PublishersController } from './publishers.controller';
 import { PublisherService } from './services/publisher.service';
 import { AuthorService } from './services/author.service';
 import { AuthorsController } from './authors.controller';
-import { AuthModule } from '../auth/auth.module';
 
 @Module({
   providers: [BooksService, IsbnService, PublisherService, AuthorService],
   controllers: [BooksController, PublishersController, AuthorsController],
   imports: [
-    // AuthModule,
     HttpModule,
     UsersModule,
     MongooseModule.forFeature([

@@ -11,10 +11,10 @@ import configuration from '../config/configuration';
   imports: [
     UsersModule,
     PassportModule,
-    JwtModule.register({
-      // secret: `${configuration().auth.secret}`,
-      secret: 'asupersecretpassword',
-      signOptions: { expiresIn: '7d' },
+    JwtModule.registerAsync({
+      useFactory: async () => ({
+        secretOrPrivateKey: configuration().auth.secret,
+      }),
     }),
   ],
   providers: [AuthService, JwtStrategy],

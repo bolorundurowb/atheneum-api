@@ -10,11 +10,12 @@ import configuration from '../../config/configuration';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
+    const secret = `${configuration().auth.secret}`;
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      // secretOrKey: `${configuration().auth.secret}`,
-      secretOrKey: 'asupersecretpassword',
+      secretOrKey: secret,
+      // secretOrKey: 'asupersecretpassword',
     });
   }
 
