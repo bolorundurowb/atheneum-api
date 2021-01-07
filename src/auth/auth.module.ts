@@ -12,11 +12,16 @@ import configuration from '../config/configuration';
     UsersModule,
     PassportModule,
     JwtModule.register({
-      secret: `${configuration().auth.secret}`,
+      // secret: `${configuration().auth.secret}`,
+      secret: 'asupersecretpassword',
       signOptions: { expiresIn: '7d' },
     }),
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
+  exports: [
+    PassportModule,
+    JwtModule
+  ]
 })
 export class AuthModule {}

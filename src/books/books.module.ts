@@ -17,7 +17,7 @@ import { AuthModule } from '../auth/auth.module';
   providers: [BooksService, IsbnService, PublisherService, AuthorService],
   controllers: [BooksController, PublishersController, AuthorsController],
   imports: [
-    AuthModule,
+    // AuthModule,
     HttpModule,
     UsersModule,
     MongooseModule.forFeature([

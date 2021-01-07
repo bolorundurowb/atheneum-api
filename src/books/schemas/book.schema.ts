@@ -4,15 +4,18 @@
 
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import * as mongoose from 'mongoose';
 import { User } from '../../users/schemas/user.schema';
 import { Author } from './author.schema';
 import { Publisher } from './publisher.schema';
+import * as shortId from 'shortid';
 
 export type BookDocument = Book & Document;
 
 @Schema()
 export class Book {
+  @Prop({ default: shortId.generate })
+  _id: string;
+
   @Prop()
   externalId: string;
 
@@ -34,13 +37,13 @@ export class Book {
   @Prop()
   publishYear: number;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  @Prop({ type: String, ref: 'User' })
   owner: User;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Author' }] })
+  @Prop({ type: [{ type: String, ref: 'Author' }] })
   authors: Array<Author>;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Publisher' })
+  @Prop({ type: String, ref: 'Publisher' })
   publisher: Publisher;
 }
 
