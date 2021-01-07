@@ -32,12 +32,11 @@ export class IsbnService {
         publishYear: +volInfo.publishedDate,
         summary: volInfo.description,
         title: volInfo.title,
-        isbn: volInfo.industryIdentifiers.filter(
-          (x) => x.type === 'ISBN_10',
-        )[0],
+        isbn: volInfo.industryIdentifiers.filter((x) => x.type === 'ISBN_10')[0]
+          ?.identifier,
         isbn13: volInfo.industryIdentifiers.filter(
           (x) => x.type === 'ISBN_13',
-        )[0],
+        )[0]?.identifier,
         coverArt: volInfo.imageLinks.thumbnail,
         pageCount: volInfo.pageCount,
       };
