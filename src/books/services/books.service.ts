@@ -32,7 +32,12 @@ export class BooksService {
       .sort({ title: 'asc' });
   }
 
-  async addByIsbn(ownerId: string, isbn: string): Promise<Book> {
+  async addByIsbn(
+    ownerId: string,
+    isbn: string,
+    longitude?: number,
+    latitude?: number,
+  ): Promise<Book> {
     // find the owner
     const owner = await this.userService.findById(ownerId);
 
@@ -116,7 +121,15 @@ export class BooksService {
       );
     }
 
-    book = new this.bookModel(Object.assign(bookInfo, { owner }));
+    book = new this.bookModel(
+      Object.assign(bookInfo, {
+        owner,
+        location: {
+          type: 'Point',
+          coordinates: [longitude, latitude],
+        },
+      }),
+    );
     return book.save();
   }
 

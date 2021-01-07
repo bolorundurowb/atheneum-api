@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { BooksService } from './services/books.service';
 import { BookIsbnDto } from './dtos/book-isbn.dto';
@@ -20,7 +27,12 @@ export class BooksController {
   @Post('isbn')
   async createFromIsbn(@Request() req, @Body() payload: BookIsbnDto) {
     const userId = req.user.id;
-    return this.bookService.addByIsbn(userId, payload.isbn);
+    return this.bookService.addByIsbn(
+      userId,
+      payload.isbn,
+      payload.longitude,
+      payload.latitude,
+    );
   }
 
   @Post('manual')
