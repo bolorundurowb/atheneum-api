@@ -195,6 +195,10 @@ export class BooksService {
         owner,
         authors,
         publisher,
+        location: {
+          type: 'Point',
+          coordinates: [details.longitude, details.latitude],
+        },
       }),
     );
     return book.save();

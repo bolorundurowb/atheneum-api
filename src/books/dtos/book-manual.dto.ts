@@ -2,7 +2,7 @@
  * Created by bolorundurowb on 1/3/2021
  */
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class BookManualDto {
   @ApiProperty()
@@ -37,4 +37,12 @@ export class BookManualDto {
 
   @ApiProperty()
   pageCount?: number;
+
+  @ApiProperty()
+  @IsOptional()
+  longitude?: number;
+
+  @ApiProperty()
+  @IsOptional()
+  latitude?: number;
 }
