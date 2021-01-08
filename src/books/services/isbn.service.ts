@@ -11,14 +11,16 @@ export class IsbnService {
     'https://www.googleapis.com/books/v1/volumes?q=isbn:';
   private readonly logger = new Logger(IsbnService.name);
 
-  constructor(private httpService: HttpService) {}
+  constructor(private httpService: HttpService) {
+  }
 
   async getBookByIsbn(isbn: string): Promise<BookInfoDto> {
     try {
       const response = await this.httpService
         .get<any>(`${this.baseUrl}${isbn}`)
         .toPromise();
-      const data = response.data.items[0];
+      const items = response.data?.items || [];
+      const data = items[0];
 
       if (!data) {
         return null;
@@ -27,7 +29,7 @@ export class IsbnService {
       const volInfo = data.volumeInfo;
       return {
         externalId: data.id,
-        authors: volInfo.authors,
+        authors: volInfo.authors || [undefined],
         publisher: volInfo.publisher,
         publishYear: +volInfo.publishedDate,
         summary: volInfo.description,
@@ -37,7 +39,7 @@ export class IsbnService {
         isbn13: volInfo.industryIdentifiers.filter(
           (x) => x.type === 'ISBN_13',
         )[0]?.identifier,
-        coverArt: volInfo.imageLinks.thumbnail,
+        coverArt: volInfo.imageLinks?.thumbnail,
         pageCount: volInfo.pageCount,
       };
     } catch (err) {
@@ -45,6 +47,7 @@ export class IsbnService {
         'An error occurred when retrieving external book info.',
         err,
       );
+
       return null;
     }
   }

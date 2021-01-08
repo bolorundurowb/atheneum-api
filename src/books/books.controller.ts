@@ -2,7 +2,7 @@ import {
   Body,
   Controller,
   Get,
-  Post,
+  Post, Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -11,6 +11,7 @@ import { BooksService } from './services/books.service';
 import { BookIsbnDto } from './dtos/book-isbn.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { BookManualDto } from './dtos/book-manual.dto';
+import { BookQueryDto } from './dtos/book-query.dto';
 
 @ApiTags('Books')
 @UseGuards(JwtAuthGuard)
@@ -19,9 +20,9 @@ export class BooksController {
   constructor(private bookService: BooksService) {}
 
   @Get()
-  async getAll(@Request() req) {
+  async getAll(@Request() req, @Query() qm: BookQueryDto) {
     const userId = req.user.id;
-    return this.bookService.getAll(userId);
+    return this.bookService.getAll(userId, qm);
   }
 
   @Post('isbn')
