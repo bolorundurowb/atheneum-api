@@ -11,7 +11,8 @@ export class IsbnService {
     'https://www.googleapis.com/books/v1/volumes?q=isbn:';
   private readonly logger = new Logger(IsbnService.name);
 
-  constructor(private httpService: HttpService) {}
+  constructor(private httpService: HttpService) {
+  }
 
   async getBookByIsbn(isbn: string): Promise<BookInfoDto> {
     try {
@@ -37,7 +38,7 @@ export class IsbnService {
         isbn13: volInfo.industryIdentifiers.filter(
           (x) => x.type === 'ISBN_13',
         )[0]?.identifier,
-        coverArt: volInfo.imageLinks.thumbnail,
+        coverArt: volInfo.imageLinks?.thumbnail,
         pageCount: volInfo.pageCount,
       };
     } catch (err) {
@@ -45,6 +46,7 @@ export class IsbnService {
         'An error occurred when retrieving external book info.',
         err,
       );
+
       return null;
     }
   }

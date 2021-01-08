@@ -47,9 +47,8 @@ export class Book {
   publisher: Publisher;
 
   @Prop({
-    type: { type: String, enum: ['Point'], required: true },
-    coordinates: { type: [Number], required: true },
-    required: false,
+    type: { type: String, enum: ['Point'], required: false },
+    coordinates: { type: [Number], required: false },
   })
   location: any;
 }

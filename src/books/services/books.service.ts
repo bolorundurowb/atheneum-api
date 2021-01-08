@@ -12,6 +12,7 @@ import { Author, AuthorDocument } from '../schemas/author.schema';
 import { Publisher, PublisherDocument } from '../schemas/publisher.schema';
 import { UsersService } from '../../users/services/users.service';
 import { BookManualDto } from '../dtos/book-manual.dto';
+import { BookQueryDto } from '../dtos/book-query.dto';
 
 @Injectable()
 export class BooksService {
@@ -24,12 +25,40 @@ export class BooksService {
     private publisherModel: Model<PublisherDocument>,
   ) {}
 
-  async getAll(ownerId: any): Promise<Array<any>> {
+  async getAll(ownerId: any, qm: BookQueryDto): Promise<Array<any>> {
+    const query: any = {
+      owner: ownerId,
+    };
+
+    if (qm.search) {
+      const caseInsensitiveSearch = {
+        $regex: new RegExp(qm.search, 'i'),
+      };
+
+      const orQueries: Array<any> = [
+        { title: caseInsensitiveSearch },
+        { summary: caseInsensitiveSearch },
+        { isbn: caseInsensitiveSearch },
+        { isbn13: caseInsensitiveSearch },
+      ];
+
+      // @ts-ignore
+      if (!isNaN(qm.search)) {
+        orQueries.push({
+          publishYear: Number(qm.search),
+        });
+      }
+
+      query.$or = orQueries;
+    }
+
+    console.log(query);
+
     return this.bookModel
-      .find({
-        owner: ownerId,
-      })
-      .sort({ title: 'asc' });
+      .find(query)
+      .sort({ title: 'asc' })
+      .skip(Number(qm.skip || 0))
+      .limit(Number(qm.limit || 30));
   }
 
   async addByIsbn(
@@ -55,10 +84,11 @@ export class BooksService {
     }
 
     // find the publisher or create if they dont exist
+    const publisherName = bookInfo.publisher || 'No Publisher';
     let publisher = await this.publisherModel.findOne({
       owner,
       name: {
-        $regex: bookInfo.publisher,
+        $regex: publisherName,
         $options: 'i',
       },
     });
@@ -66,7 +96,7 @@ export class BooksService {
     if (!publisher) {
       publisher = new this.publisherModel({
         owner,
-        name: bookInfo.publisher,
+        name: publisherName,
       });
       await publisher.save();
     }
@@ -74,7 +104,8 @@ export class BooksService {
     // find the authors or create if they dont exist
     const authors = [];
 
-    for (const authorName of bookInfo.authors) {
+    for (let authorName of bookInfo.authors) {
+      authorName = authorName || 'No Author';
       let author = await this.authorModel.findOne({
         owner,
         name: {
@@ -121,15 +152,20 @@ export class BooksService {
       );
     }
 
-    book = new this.bookModel(
-      Object.assign(bookInfo, {
-        owner,
+    let model = Object.assign(bookInfo, {
+      owner,
+    });
+
+    if (longitude && latitude) {
+      model = Object.assign(model, {
         location: {
           type: 'Point',
           coordinates: [longitude, latitude],
         },
-      }),
-    );
+      });
+    }
+
+    book = new this.bookModel(model);
     return book.save();
   }
 
