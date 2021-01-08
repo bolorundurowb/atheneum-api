@@ -19,7 +19,8 @@ export class IsbnService {
       const response = await this.httpService
         .get<any>(`${this.baseUrl}${isbn}`)
         .toPromise();
-      const data = response.data.items[0];
+      const items = response.data?.items || [];
+      const data = items[0];
 
       if (!data) {
         return null;
@@ -28,7 +29,7 @@ export class IsbnService {
       const volInfo = data.volumeInfo;
       return {
         externalId: data.id,
-        authors: volInfo.authors,
+        authors: volInfo.authors || [undefined],
         publisher: volInfo.publisher,
         publishYear: +volInfo.publishedDate,
         summary: volInfo.description,
