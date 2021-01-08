@@ -45,6 +45,13 @@ export class Book {
 
   @Prop({ type: String, ref: 'Publisher' })
   publisher: Publisher;
+
+  @Prop({
+    type: { type: String, enum: ['Point'], required: true },
+    coordinates: { type: [Number], required: true },
+    required: false,
+  })
+  location: any;
 }
 
 export const BookSchema = SchemaFactory.createForClass(Book);
