@@ -52,8 +52,6 @@ export class BooksService {
       query.$or = orQueries;
     }
 
-    console.log(query);
-
     return this.bookModel
       .find(query)
       .sort({ title: 'asc' })
