@@ -62,4 +62,11 @@ export class WishListService {
 
     return wish;
   }
+
+  async remove(ownerId: any, wishId: any): Promise<void> {
+    await this.wishListModel.findOneAndDelete({
+      owner: ownerId,
+      _id: wishId,
+    });
+  }
 }
