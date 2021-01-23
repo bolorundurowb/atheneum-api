@@ -53,6 +53,11 @@ export class BooksService {
       query.$or = orQueries;
     }
 
+    if (qm.available !== undefined) {
+      query.isAvailable = Boolean(qm.available);
+    }
+    console.log(qm, query);
+
     return this.bookModel
       .find(query)
       .sort({ title: 'asc' })
@@ -257,7 +262,7 @@ export class BooksService {
       throw new BadRequestException(null, 'Book is unavailable.');
     }
 
-    if (book.borrowingHistory) {
+    if (!book.borrowingHistory) {
       book.borrowingHistory = [];
     }
 
@@ -288,11 +293,10 @@ export class BooksService {
       );
     }
 
-    if (book.borrowingHistory) {
-      book.borrowingHistory = [];
+    if (!book.borrowingHistory) {
+      throw new BadRequestException(null, 'Book has no borrowing history.');
     }
 
-    console.log(book);
     const borrowRecord = book.borrowingHistory.filter((x) => !x.returnedAt)[0];
 
     if (borrowRecord) {

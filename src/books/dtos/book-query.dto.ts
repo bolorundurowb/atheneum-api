@@ -16,4 +16,8 @@ export class BookQueryDto {
   @ApiProperty()
   @IsNumberString()
   limit: string;
+
+  @ApiProperty()
+  @IsOptional()
+  available?: boolean;
 }
