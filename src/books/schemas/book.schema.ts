@@ -2,7 +2,7 @@
  * Created by bolorundurowb on 12/26/2020
  */
 
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { User } from '../../users/schemas/user.schema';
 import { Author } from './author.schema';
@@ -51,6 +51,20 @@ export class Book {
     coordinates: { type: [Number], required: false },
   })
   location: any;
+
+  @Prop({ type: Boolean, default: true })
+  isAvailable: boolean;
+
+  @Prop(
+    raw([
+      {
+        borrowedBy: { type: String },
+        borrowedAt: { type: Date },
+        returnedAt: { type: Date },
+      },
+    ]),
+  )
+  borrowingHistory: Array<Record<string, any>>;
 }
 
 export const BookSchema = SchemaFactory.createForClass(Book);
