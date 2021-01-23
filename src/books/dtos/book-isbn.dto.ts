@@ -1,6 +1,7 @@
 /**
  * Created by bolorundurowb on 1/2/2021
  */
+
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
 
