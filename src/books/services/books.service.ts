@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -236,5 +237,36 @@ export class BooksService {
       }),
     );
     return book.save();
+  }
+
+  async borrow(
+    ownerId: any,
+    bookId: string,
+    borrowerName: string,
+  ): Promise<Book> {
+    const book = await this.bookModel.findOne({
+      owner: ownerId,
+      _id: bookId,
+    });
+
+    if (!book) {
+      throw new NotFoundException(null, 'Book not found.');
+    }
+
+    if (!book.isAvailable) {
+      throw new BadRequestException(null, 'Book is unavailable.');
+    }
+
+    if (book.borrowingHistory) {
+      book.borrowingHistory = [];
+    }
+
+    book.borrowingHistory.push({
+      borrowedBy: borrowerName,
+      borrowedAt: new Date(),
+    });
+    await book.save();
+
+    return book;
   }
 }
