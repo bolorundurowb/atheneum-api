@@ -239,7 +239,7 @@ export class BooksService {
     return book.save();
   }
 
-  async borrow(
+  async borrowBook(
     ownerId: any,
     bookId: string,
     borrowerName: string,
@@ -266,6 +266,37 @@ export class BooksService {
       borrowedAt: new Date(),
     });
     await book.save();
+
+    return book;
+  }
+
+  async returnBook(ownerId: any, bookId: string): Promise<Book> {
+    const book = await this.bookModel.findOne({
+      owner: ownerId,
+      _id: bookId,
+    });
+
+    if (!book) {
+      throw new NotFoundException(null, 'Book not found.');
+    }
+
+    if (book.isAvailable) {
+      throw new BadRequestException(
+        null,
+        'An available book cannot be returned.',
+      );
+    }
+
+    if (book.borrowingHistory) {
+      book.borrowingHistory = [];
+    }
+
+    const borrowRecord = book.borrowingHistory.filter((x) => !x.returnedAt)[0];
+
+    if (borrowRecord) {
+      borrowRecord.returnedAt = new Date();
+      await book.save();
+    }
 
     return book;
   }
