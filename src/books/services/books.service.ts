@@ -261,6 +261,7 @@ export class BooksService {
       book.borrowingHistory = [];
     }
 
+    book.isAvailable = false;
     book.borrowingHistory.push({
       borrowedBy: borrowerName,
       borrowedAt: new Date(),
@@ -291,10 +292,12 @@ export class BooksService {
       book.borrowingHistory = [];
     }
 
+    console.log(book);
     const borrowRecord = book.borrowingHistory.filter((x) => !x.returnedAt)[0];
 
     if (borrowRecord) {
       borrowRecord.returnedAt = new Date();
+      book.isAvailable = true;
       await book.save();
     }
 
