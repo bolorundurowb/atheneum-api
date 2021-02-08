@@ -14,14 +14,12 @@ import configuration from '../config/configuration';
     JwtModule.registerAsync({
       useFactory: async () => ({
         secretOrPrivateKey: configuration().auth.secret,
+        signOptions: { expiresIn: '30d' },
       }),
     }),
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
-  exports: [
-    PassportModule,
-    JwtModule
-  ]
+  exports: [PassportModule, JwtModule],
 })
 export class AuthModule {}
