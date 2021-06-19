@@ -52,7 +52,7 @@ export class AuthService {
     };
   }
 
-  async requestReset(emailAddress: string): Promise<void> {
+  async forgotPassword(emailAddress: string): Promise<void> {
     const user = await this.userService.findByEmail(emailAddress);
 
     if (!user) {
