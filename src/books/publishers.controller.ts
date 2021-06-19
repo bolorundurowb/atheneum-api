@@ -9,7 +9,7 @@ import { PublisherService } from './services/publisher.service';
 
 @ApiTags('Publishers')
 @UseGuards(JwtAuthGuard)
-@Controller('publishers')
+@Controller('v1/publishers')
 export class PublishersController {
   constructor(private publisherService: PublisherService) {}
 

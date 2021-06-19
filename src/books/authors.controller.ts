@@ -9,7 +9,7 @@ import { AuthorService } from './services/author.service';
 
 @ApiTags('Authors')
 @UseGuards(JwtAuthGuard)
-@Controller('authors')
+@Controller('v1/authors')
 export class AuthorsController {
   constructor(private authorService: AuthorService) {}
 

@@ -14,7 +14,7 @@ import { ForgotPasswordDto } from './dtos/forgot-password.dto';
 import { MessageDto } from './dtos/message.dto';
 
 @ApiTags('Auth')
-@Controller('auth')
+@Controller('v1/auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 

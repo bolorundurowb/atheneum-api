@@ -21,23 +21,13 @@ export class TemplateService {
 
   private generateHtml(templateName, data): string {
     const baseEmailTemplateString = fs.readFileSync(
-      path.join(
-        path.dirname(__dirname),
-        'shared',
-        'templates',
-        'baseEmailTemplate.hbs',
-      ),
+      path.join(path.dirname(__dirname), 'templates', 'baseEmailTemplate.hbs'),
       'utf8',
     );
     const baseEmailTemplate = handlebars.compile(baseEmailTemplateString);
 
     const templateString = fs.readFileSync(
-      path.join(
-        path.dirname(__dirname),
-        'shared',
-        'templates',
-        `${templateName}.hbs`,
-      ),
+      path.join(path.dirname(__dirname), 'templates', `${templateName}.hbs`),
       'utf8',
     );
     const template = handlebars.compile(templateString);

@@ -68,6 +68,7 @@ export class AuthService {
       user.firstName,
       resetCode,
     );
+    console.log(content);
     await this.emailService.send(user.emailAddress, 'Your reset code', content);
   }
 
