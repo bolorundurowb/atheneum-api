@@ -15,5 +15,8 @@ export default () => {
     database: {
       url: process.env.DB_URL,
     },
+    sendgrid: {
+      apiKey: process.env.SENDGRID_API_KEY
+    }
   };
 };
