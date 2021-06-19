@@ -5,9 +5,10 @@
 import { Module } from '@nestjs/common';
 import { EmailService } from './services/email.service';
 import { CodeService } from './services/code.service';
+import { TemplateService } from './services/template.service';
 
 @Module({
-  providers: [EmailService, CodeService],
-  exports: [EmailService, CodeService],
+  providers: [EmailService, CodeService, TemplateService],
+  exports: [EmailService, CodeService, TemplateService],
 })
 export class SharedModule {}
