@@ -18,7 +18,7 @@ import { BorrowBookDto } from './dtos/borrow-book.dto';
 
 @ApiTags('Books')
 @UseGuards(JwtAuthGuard)
-@Controller('books')
+@Controller('v1/books')
 export class BooksController {
   constructor(private bookService: BooksService) {}
 

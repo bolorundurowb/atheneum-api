@@ -30,6 +30,9 @@ export class User {
     },
   })
   passwordHash: string;
+
+  @Prop()
+  resetCode: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

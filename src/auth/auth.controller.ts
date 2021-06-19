@@ -4,14 +4,17 @@ import { CredentialsDto } from './dtos/credentials.dto';
 import {
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { AuthDto } from './dtos/auth.dto';
+import { ForgotPasswordDto } from './dtos/forgot-password.dto';
+import { MessageDto } from './dtos/message.dto';
 
 @ApiTags('Auth')
-@Controller('auth')
+@Controller('v1/auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
@@ -43,5 +46,22 @@ export class AuthController {
       credentials.emailAddress,
       credentials.password,
     );
+  }
+
+  @Post('forgot-password')
+  @ApiOkResponse({
+    description: 'Password reset email dispatched',
+    type: MessageDto,
+  })
+  @ApiNotFoundResponse({
+    description: 'A user account does not exist for the provided email',
+  })
+  async forgotPassword(
+    @Body() payload: ForgotPasswordDto,
+  ): Promise<MessageDto> {
+    await this.authService.forgotPassword(payload.emailAddress);
+    return {
+      message: 'A reset code has been sent to your email address.',
+    };
   }
 }
