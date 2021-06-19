@@ -45,6 +45,21 @@ export class AuthService {
     };
   }
 
+  async requestReset(emailAddress: string): Promise<AuthDto> {
+    let user = await this.userService.findByEmail(emailAddress);
+
+    if (user) {
+      throw new ConflictException(null, 'User account already exists.');
+    }
+
+    user = await this.userService.create(emailAddress, password);
+    return {
+      authToken: this.generateAuthToken(user),
+      fullName: `${user.firstName} ${user.lastName}`,
+      emailAddress: user.emailAddress,
+    };
+  }
+
   private generateAuthToken(user: any): string {
     return this.jwtService.sign({
       email: user.emailAddress,
