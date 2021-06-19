@@ -8,12 +8,17 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { AuthDto } from '../dtos/auth.dto';
 import { v4 as uuid } from 'uuid';
+import { CodeService } from '../../shared/services/code.service';
+import { UserDocument } from '../../users/schemas/user.schema';
+import { EmailService } from '../../shared/services/email.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UsersService,
     private jwtService: JwtService,
+    private codeService: CodeService,
+    private emailService: EmailService
   ) {}
 
   async login(emailAddress: string, password: string): Promise<AuthDto> {
@@ -45,19 +50,23 @@ export class AuthService {
     };
   }
 
-  async requestReset(emailAddress: string): Promise<AuthDto> {
-    let user = await this.userService.findByEmail(emailAddress);
+  async requestReset(emailAddress: string): Promise<void> {
+    const user = await this.userService.findByEmail(emailAddress);
 
-    if (user) {
-      throw new ConflictException(null, 'User account already exists.');
+    if (!user) {
+      throw new ConflictException(null, 'User account not found.');
     }
 
-    user = await this.userService.create(emailAddress, password);
-    return {
-      authToken: this.generateAuthToken(user),
-      fullName: `${user.firstName} ${user.lastName}`,
-      emailAddress: user.emailAddress,
-    };
+    const resetCode = this.codeService.generateResetCode();
+    user.resetCode = resetCode;
+    await (<UserDocument>user).save();
+
+    // send an email to the user
+    await this.emailService.send(
+      user.emailAddress,
+      'Your reset code',
+      resetCode,
+    );
   }
 
   private generateAuthToken(user: any): string {

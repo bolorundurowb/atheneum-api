@@ -35,8 +35,7 @@ export class UsersService {
 
     user.firstName = payload.firstName;
     user.lastName = payload.lastName;
-    // @ts-ignore
-    await user.save();
+    await (<UserDocument>user).save();
 
     return user;
   }

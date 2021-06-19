@@ -6,10 +6,12 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import configuration from '../config/configuration';
+import { SharedModule } from '../shared/shared.module';
 
 @Module({
   imports: [
     UsersModule,
+    SharedModule,
     PassportModule,
     JwtModule.registerAsync({
       useFactory: async () => ({
