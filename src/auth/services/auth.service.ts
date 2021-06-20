@@ -1,7 +1,8 @@
 import {
   BadRequestException,
   ConflictException,
-  Injectable, NotFoundException,
+  Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../../users/services/users.service';
@@ -22,8 +23,7 @@ export class AuthService {
     private codeService: CodeService,
     private emailService: EmailService,
     private templateService: TemplateService,
-  ) {
-  }
+  ) {}
 
   async login(emailAddress: string, password: string): Promise<AuthDto> {
     const user = await this.userService.findByEmail(emailAddress);
@@ -88,11 +88,14 @@ export class AuthService {
     await (<UserDocument>user).save();
 
     // send an email to the user
-    const content = await this.templateService.getForgotPasswordContent(
+    const content = await this.templateService.getResetPasswordContent(
       user.firstName,
-      resetCode,
     );
-    await this.emailService.send(user.emailAddress, 'Your reset code', content);
+    await this.emailService.send(
+      user.emailAddress,
+      'Reset successfully',
+      content,
+    );
   }
 
   private generateAuthToken(user: any): string {
