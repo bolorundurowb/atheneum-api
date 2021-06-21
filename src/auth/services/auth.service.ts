@@ -1,6 +1,8 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../../users/services/users.service';
@@ -56,7 +58,7 @@ export class AuthService {
     const user = await this.userService.findByEmail(emailAddress);
 
     if (!user) {
-      throw new ConflictException(null, 'User account not found.');
+      throw new NotFoundException(null, 'User account not found.');
     }
 
     const resetCode = this.codeService.generateResetCode();
@@ -69,6 +71,31 @@ export class AuthService {
       resetCode,
     );
     await this.emailService.send(user.emailAddress, 'Your reset code', content);
+  }
+
+  async resetPassword(emailAddress: string, resetCode: string): Promise<void> {
+    const user = await this.userService.findByEmail(emailAddress);
+
+    if (!user) {
+      throw new NotFoundException(null, 'User account not found.');
+    }
+
+    if (user.resetCode !== resetCode) {
+      throw new BadRequestException(null, 'Reset code does not match.');
+    }
+
+    user.resetCode = null;
+    await (<UserDocument>user).save();
+
+    // send an email to the user
+    const content = await this.templateService.getResetPasswordContent(
+      user.firstName,
+    );
+    await this.emailService.send(
+      user.emailAddress,
+      'Reset successfully',
+      content,
+    );
   }
 
   private generateAuthToken(user: any): string {

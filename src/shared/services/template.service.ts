@@ -19,6 +19,15 @@ export class TemplateService {
     });
   }
 
+  public getResetPasswordContent(firstName): string {
+    const templateName = 'resetPassword';
+    firstName = firstName || 'there';
+
+    return this.generateHtml(templateName, {
+      firstName
+    });
+  }
+
   private generateHtml(templateName, data): string {
     const baseEmailTemplateString = fs.readFileSync(
       path.join(path.dirname(__dirname), 'templates', 'baseEmailTemplate.hbs'),
