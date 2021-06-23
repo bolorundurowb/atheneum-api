@@ -3,7 +3,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
+  UnauthorizedException
 } from '@nestjs/common';
 import { UsersService } from '../../users/services/users.service';
 import * as bcrypt from 'bcrypt';
@@ -22,7 +22,7 @@ export class AuthService {
     private jwtService: JwtService,
     private codeService: CodeService,
     private emailService: EmailService,
-    private templateService: TemplateService,
+    private templateService: TemplateService
   ) {}
 
   async login(emailAddress: string, password: string): Promise<AuthDto> {
@@ -32,7 +32,7 @@ export class AuthService {
       return {
         authToken: this.generateAuthToken(user),
         fullName: `${user.firstName} ${user.lastName}`,
-        emailAddress: user.emailAddress,
+        emailAddress: user.emailAddress
       };
     }
 
@@ -50,7 +50,7 @@ export class AuthService {
     return {
       authToken: this.generateAuthToken(user),
       fullName: `${user.firstName} ${user.lastName}`,
-      emailAddress: user.emailAddress,
+      emailAddress: user.emailAddress
     };
   }
 
@@ -68,12 +68,16 @@ export class AuthService {
     // send an email to the user
     const content = await this.templateService.getForgotPasswordContent(
       user.firstName,
-      resetCode,
+      resetCode
     );
     await this.emailService.send(user.emailAddress, 'Your reset code', content);
   }
 
-  async resetPassword(emailAddress: string, resetCode: string): Promise<void> {
+  async resetPassword(
+    emailAddress: string,
+    resetCode: string,
+    password: string
+  ): Promise<void> {
     const user = await this.userService.findByEmail(emailAddress);
 
     if (!user) {
@@ -84,17 +88,18 @@ export class AuthService {
       throw new BadRequestException(null, 'Reset code does not match.');
     }
 
+    user.passwordHash = password;
     user.resetCode = null;
     await (<UserDocument>user).save();
 
     // send an email to the user
     const content = await this.templateService.getResetPasswordContent(
-      user.firstName,
+      user.firstName
     );
     await this.emailService.send(
       user.emailAddress,
       'Reset successfully',
-      content,
+      content
     );
   }
 
@@ -102,7 +107,7 @@ export class AuthService {
     return this.jwtService.sign({
       email: user.emailAddress,
       id: user._id,
-      sub: uuid(),
+      sub: uuid()
     });
   }
 }

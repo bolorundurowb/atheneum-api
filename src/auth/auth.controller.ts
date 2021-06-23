@@ -82,6 +82,7 @@ export class AuthController {
     await this.authService.resetPassword(
       payload.emailAddress,
       payload.resetCode,
+      payload.password
     );
     return {
       message: 'Password reset successful.',
