@@ -10,7 +10,7 @@ export class UsersService {
 
   async findByEmail(emailAddress: string): Promise<User | undefined> {
     return this.userModel.findOne({
-      emailAddress,
+      emailAddress
     });
   }
 
@@ -21,7 +21,7 @@ export class UsersService {
   async create(emailAddress: string, password: string): Promise<User> {
     const user = new this.userModel({
       emailAddress: emailAddress,
-      passwordHash: password,
+      passwordHash: password
     });
     return user.save();
   }
