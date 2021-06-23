@@ -16,4 +16,9 @@ export class ResetPasswordDto {
   @IsNotEmpty()
   @IsNumberString()
   resetCode: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  password: string;
 }
