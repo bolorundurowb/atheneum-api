@@ -15,8 +15,9 @@ export default () => {
     database: {
       url: process.env.DB_URL,
     },
-    sendgrid: {
-      apiKey: process.env.SENDGRID_API_KEY
+    mailgun: {
+      apiKey: process.env.MAILGUN_API_KEY,
+      domain: process.env.MAILGUN_DOMAIN
     }
   };
 };
