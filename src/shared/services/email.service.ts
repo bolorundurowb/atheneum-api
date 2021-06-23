@@ -2,31 +2,40 @@
  * Created by bolorundurowb on 6/19/2021
  */
 
-import { Injectable } from '@nestjs/common';
-import * as sgMail from '@sendgrid/mail';
+import { Injectable, Logger } from '@nestjs/common';
+import * as Mailgun from 'mailgun-js';
 import configuration from '../../config/configuration';
 
 @Injectable()
 export class EmailService {
+  private logger = new Logger();
+  private mailgun: any;
+
   constructor() {
-    sgMail.setApiKey(configuration().sendgrid.apiKey);
+    this.mailgun = Mailgun({
+      apiKey: configuration().mailgun.apiKey,
+      domain: configuration().mailgun.domain
+    });
   }
 
   public async send(
     recipient: string,
     subject: string,
     content: string,
-    sender = 'atheneum@bolorundurowb.com',
-    attachments: Array<any> = [],
+    sender = 'Atheneum App <atheneum@bolorundurowb.com>',
+    attachments: Array<any> = []
   ) {
     const msg = {
       to: recipient,
       from: sender,
       subject: subject,
       html: content,
-      attachments: attachments,
+      attachments: attachments
     };
 
-    await sgMail.send(msg);
+    await this.mailgun.messages().send(msg);
+    this.logger.log(
+      `Email with subject '${subject}' sent successfully to '${recipient}'.`
+    );
   }
 }
