@@ -31,7 +31,8 @@ export class AuthService {
     if (user && bcrypt.compareSync(password, user.passwordHash)) {
       return {
         authToken: this.generateAuthToken(user),
-        fullName: `${user.firstName} ${user.lastName}`,
+        firstName: user.firstName,
+        lastName: user.lastName,
         emailAddress: user.emailAddress
       };
     }
@@ -61,7 +62,8 @@ export class AuthService {
 
     return {
       authToken: this.generateAuthToken(user),
-      fullName: `${user.firstName} ${user.lastName}`,
+      firstName: user.firstName,
+      lastName: user.lastName,
       emailAddress: user.emailAddress
     };
   }

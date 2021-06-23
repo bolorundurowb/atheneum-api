@@ -6,7 +6,10 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class AuthDto {
   @ApiProperty()
-  fullName: string;
+  firstName: string;
+
+  @ApiProperty()
+  lastName: string;
 
   @ApiProperty()
   authToken: string;
