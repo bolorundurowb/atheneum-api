@@ -16,7 +16,7 @@ export class EmailService {
     recipient: string,
     subject: string,
     content: string,
-    sender = 'no-reply@atheneum.com',
+    sender = 'atheneum@bolorundurowb.com',
     attachments: Array<any> = [],
   ) {
     const msg = {
