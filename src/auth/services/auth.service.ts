@@ -39,7 +39,11 @@ export class AuthService {
     throw new UnauthorizedException(null, 'User account not found.');
   }
 
-  async register(emailAddress: string, password: string): Promise<AuthDto> {
+  async register(
+    fullName: string,
+    emailAddress: string,
+    password: string
+  ): Promise<AuthDto> {
     let user = await this.userService.findByEmail(emailAddress);
 
     if (user) {
@@ -47,6 +51,14 @@ export class AuthService {
     }
 
     user = await this.userService.create(emailAddress, password);
+
+    if (fullName) {
+      const nameParts = fullName.split(' ');
+      user.firstName = nameParts[0] || '';
+      user.lastName = nameParts[1] || '';
+      await (<UserDocument>user).save();
+    }
+
     return {
       authToken: this.generateAuthToken(user),
       fullName: `${user.firstName} ${user.lastName}`,
