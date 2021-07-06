@@ -1,4 +1,13 @@
-import { Controller, Get, UseGuards, Request, Post, Body, Delete, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  UseGuards,
+  Request,
+  Post,
+  Body,
+  Delete,
+  Param
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { WishListService } from './services/wish-list.service';
@@ -6,10 +15,9 @@ import { AddBookDto } from './dtos/add-book.dto';
 
 @ApiTags('Wish List')
 @UseGuards(JwtAuthGuard)
-@Controller('wish-list')
+@Controller('v1/wish-list')
 export class WishListController {
-  constructor(private wishListService: WishListService) {
-  }
+  constructor(private wishListService: WishListService) {}
 
   @Get()
   async getAll(@Request() req) {
