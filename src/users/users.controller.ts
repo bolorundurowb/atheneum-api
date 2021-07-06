@@ -6,7 +6,7 @@ import { UsersService } from './services/users.service';
 
 @ApiTags('Users')
 @UseGuards(JwtAuthGuard)
-@Controller('users')
+@Controller('v1/users')
 export class UsersController {
   constructor(private userService: UsersService) {
   }
