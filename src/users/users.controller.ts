@@ -8,8 +8,7 @@ import { UsersService } from './services/users.service';
 @UseGuards(JwtAuthGuard)
 @Controller('v1/users')
 export class UsersController {
-  constructor(private userService: UsersService) {
-  }
+  constructor(private userService: UsersService) {}
 
   @Get('current')
   getCallerProfile(@Request() req) {
