@@ -10,6 +10,7 @@ import { UserProfileDto } from './dtos/user-profile.dto';
 import { UsersService } from './services/users.service';
 import { PasswordUpdateDto } from './dtos/password-update.dto';
 import { MessageDto } from '../auth/dtos/message.dto';
+import { User } from './schemas/user.schema';
 
 @ApiTags('Users')
 @UseGuards(JwtAuthGuard)
@@ -18,8 +19,9 @@ export class UsersController {
   constructor(private userService: UsersService) {}
 
   @Get('current')
-  getCallerProfile(@Request() req) {
-    return req.user;
+  async getCallerProfile(@Request() req): Promise<User> {
+    const userId = req.user.id;
+    return await this.userService.findById(userId);
   }
 
   @Put('current')
