@@ -1,5 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException
+} from '@nestjs/common';
 import { User, UserDocument } from '../schemas/user.schema';
+import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserProfileDto } from '../dtos/user-profile.dto';
@@ -38,5 +43,24 @@ export class UsersService {
     await (<UserDocument>user).save();
 
     return user;
+  }
+
+  async updatePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string
+  ): Promise<void> {
+    const user = await this.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException(null, 'User account not found.');
+    }
+
+    if (user && bcrypt.compareSync(currentPassword, user.passwordHash)) {
+      throw new BadRequestException(null, 'Current password does not match.');
+    }
+
+    user.passwordHash = newPassword;
+    await (<UserDocument>user).save();
   }
 }
