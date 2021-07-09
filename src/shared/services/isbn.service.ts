@@ -3,7 +3,7 @@
  */
 
 import { HttpService, Injectable, Logger } from '@nestjs/common';
-import { BookInfoDto } from '../dtos/book-info.dto';
+import { BookInfoDto } from '../../books/dtos/book-info.dto';
 
 @Injectable()
 export class IsbnService {

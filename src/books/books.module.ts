@@ -1,7 +1,6 @@
-import { HttpModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { BooksService } from './services/books.service';
 import { BooksController } from './books.controller';
-import { IsbnService } from './services/isbn.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Book, BookSchema } from './schemas/book.schema';
 import { Author, AuthorSchema } from './schemas/author.schema';
@@ -11,13 +10,14 @@ import { PublishersController } from './publishers.controller';
 import { PublisherService } from './services/publisher.service';
 import { AuthorService } from './services/author.service';
 import { AuthorsController } from './authors.controller';
+import { SharedModule } from '../shared/shared.module';
 
 @Module({
-  providers: [BooksService, IsbnService, PublisherService, AuthorService],
+  providers: [BooksService, PublisherService, AuthorService],
   controllers: [BooksController, PublishersController, AuthorsController],
   imports: [
-    HttpModule,
     UsersModule,
+    SharedModule,
     MongooseModule.forFeature([
       { name: Book.name, schema: BookSchema },
       { name: Author.name, schema: AuthorSchema },

@@ -9,7 +9,7 @@ import { WishList, WishListDocument } from '../schemas/wish-list.schema';
 import { Model } from 'mongoose';
 import { AddBookDto } from '../dtos/add-book.dto';
 import { UsersService } from '../../users/services/users.service';
-import { IsbnService } from '../../books/services/isbn.service';
+import { IsbnService } from '../../shared/services/isbn.service';
 
 @Injectable()
 export class WishListService {

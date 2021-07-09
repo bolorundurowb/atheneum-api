@@ -5,7 +5,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { IsbnService } from './isbn.service';
+import { IsbnService } from '../../shared/services/isbn.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Book, BookDocument } from '../schemas/book.schema';
 import { Model } from 'mongoose';
