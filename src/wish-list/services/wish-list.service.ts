@@ -1,25 +1,28 @@
 import {
   ConflictException,
   Injectable,
-  UnauthorizedException,
+  NotFoundException,
+  UnauthorizedException
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { WishList, WishListDocument } from '../schemas/wish-list.schema';
 import { Model } from 'mongoose';
 import { AddBookDto } from '../dtos/add-book.dto';
 import { UsersService } from '../../users/services/users.service';
+import { IsbnService } from '../../books/services/isbn.service';
 
 @Injectable()
 export class WishListService {
   constructor(
+    private isbnService: IsbnService,
     private userService: UsersService,
-    @InjectModel(WishList.name) private wishListModel: Model<WishListDocument>,
+    @InjectModel(WishList.name) private wishListModel: Model<WishListDocument>
   ) {}
 
   async getAll(ownerId: any): Promise<Array<any>> {
     return this.wishListModel
       .find({
-        owner: ownerId,
+        owner: ownerId
       })
       .sort({ title: 'asc' });
   }
@@ -37,27 +40,37 @@ export class WishListService {
       owner,
       title: {
         $regex: details.bookTitle,
-        $options: 'i',
+        $options: 'i'
       },
       authorName: {
         $regex: details.bookAuthor,
-        $options: 'i',
-      },
+        $options: 'i'
+      }
     });
 
     if (wish) {
       throw new ConflictException(
         null,
-        'Book already exists on your wish list.',
+        'Book already exists on your wish list.'
       );
     }
+
+    const bookInfo = await this.isbnService.getBookByIsbn(details.bookIsbn);
 
     wish = new this.wishListModel({
       owner,
       title: details.bookTitle,
       authorName: details.bookAuthor,
-      isbn: details.bookIsbn,
+      isbn: details.bookIsbn
     });
+
+    if (bookInfo && bookInfo.coverArt) {
+      wish.coverArt = bookInfo.coverArt;
+    } else {
+      wish.coverArt =
+        'https://res.cloudinary.com/dg2dgzbt4/image/upload/v1625842121/external_assets/open_source/icons/default-book-cover.png';
+    }
+
     await wish.save();
 
     return wish;
@@ -66,7 +79,7 @@ export class WishListService {
   async remove(ownerId: any, wishId: any): Promise<void> {
     await this.wishListModel.findOneAndDelete({
       owner: ownerId,
-      _id: wishId,
+      _id: wishId
     });
   }
 }

@@ -24,6 +24,9 @@ export class WishList {
   @Prop()
   isbn: string;
 
+  @Prop()
+  coverArt: string;
+
   @Prop({ type: String, ref: 'User' })
   owner: User;
 }
