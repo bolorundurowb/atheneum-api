@@ -66,9 +66,6 @@ export class WishListService {
 
     if (bookInfo && bookInfo.coverArt) {
       wish.coverArt = bookInfo.coverArt;
-    } else {
-      wish.coverArt =
-        'https://res.cloudinary.com/dg2dgzbt4/image/upload/v1625842121/external_assets/open_source/icons/default-book-cover.png';
     }
 
     await wish.save();

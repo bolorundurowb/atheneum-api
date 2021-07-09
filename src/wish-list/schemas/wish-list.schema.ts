@@ -24,7 +24,7 @@ export class WishList {
   @Prop()
   isbn: string;
 
-  @Prop()
+  @Prop({ default: 'https://res.cloudinary.com/dg2dgzbt4/image/upload/v1625842121/external_assets/open_source/icons/default-book-cover.png' })
   coverArt: string;
 
   @Prop({ type: String, ref: 'User' })
