@@ -56,11 +56,12 @@ export class BooksService {
     if (qm.available !== undefined) {
       query.isAvailable = Boolean(qm.available);
     }
-    console.log(qm, query);
 
     return this.bookModel
       .find(query)
       .sort({ title: 'asc' })
+      .populate('authors')
+      .populate('publisher')
       .skip(Number(qm.skip || 0))
       .limit(Number(qm.limit || 30));
   }
