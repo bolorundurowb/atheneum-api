@@ -3,7 +3,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
+  UnauthorizedException
 } from '@nestjs/common';
 import { IsbnService } from '../../shared/services/isbn.service';
 import { InjectModel } from '@nestjs/mongoose';
@@ -23,30 +23,30 @@ export class BooksService {
     @InjectModel(Book.name) private bookModel: Model<BookDocument>,
     @InjectModel(Author.name) private authorModel: Model<AuthorDocument>,
     @InjectModel(Publisher.name)
-    private publisherModel: Model<PublisherDocument>,
+    private publisherModel: Model<PublisherDocument>
   ) {}
 
   async getAll(ownerId: any, qm: BookQueryDto): Promise<Array<any>> {
     const query: any = {
-      owner: ownerId,
+      owner: ownerId
     };
 
     if (qm.search) {
       const caseInsensitiveSearch = {
-        $regex: new RegExp(qm.search, 'i'),
+        $regex: new RegExp(qm.search, 'i')
       };
 
       const orQueries: Array<any> = [
         { title: caseInsensitiveSearch },
         { summary: caseInsensitiveSearch },
         { isbn: caseInsensitiveSearch },
-        { isbn13: caseInsensitiveSearch },
+        { isbn13: caseInsensitiveSearch }
       ];
 
       // @ts-ignore
       if (!isNaN(qm.search)) {
         orQueries.push({
-          publishYear: Number(qm.search),
+          publishYear: Number(qm.search)
         });
       }
 
@@ -60,8 +60,8 @@ export class BooksService {
     return this.bookModel
       .find(query)
       .sort({ title: 'asc' })
-      .populate('authors')
-      .populate('publisher')
+      .populate('publisher', 'name')
+      .populate('authors', 'name')
       .skip(Number(qm.skip || 0))
       .limit(Number(qm.limit || 30));
   }
@@ -70,7 +70,7 @@ export class BooksService {
     ownerId: string,
     isbn: string,
     longitude?: number,
-    latitude?: number,
+    latitude?: number
   ): Promise<Book> {
     // find the owner
     const owner = await this.userService.findById(ownerId);
@@ -84,7 +84,7 @@ export class BooksService {
     if (!bookInfo) {
       throw new NotFoundException(
         null,
-        'A book with the provided ISBN does not exist.',
+        'A book with the provided ISBN does not exist.'
       );
     }
 
@@ -94,14 +94,14 @@ export class BooksService {
       owner,
       name: {
         $regex: publisherName,
-        $options: 'i',
-      },
+        $options: 'i'
+      }
     });
 
     if (!publisher) {
       publisher = new this.publisherModel({
         owner,
-        name: publisherName,
+        name: publisherName
       });
       await publisher.save();
     }
@@ -115,14 +115,14 @@ export class BooksService {
         owner,
         name: {
           $regex: authorName,
-          $options: 'i',
-        },
+          $options: 'i'
+        }
       });
 
       if (!author) {
         author = new this.authorModel({
           owner,
-          name: authorName,
+          name: authorName
         });
         await author.save();
       }
@@ -136,37 +136,39 @@ export class BooksService {
         {
           title: {
             $regex: bookInfo.title,
-            $options: 'i',
-          },
+            $options: 'i'
+          }
         },
         {
           $or: [
             { isbn: bookInfo.isbn },
             { isbn: bookInfo.isbn13 },
             { isbn13: bookInfo.isbn },
-            { isbn13: bookInfo.isbn13 },
-          ],
-        },
-      ],
+            { isbn13: bookInfo.isbn13 }
+          ]
+        }
+      ]
     });
 
     if (book) {
       throw new ConflictException(
         null,
-        'Book with same title and ISBN exists.',
+        'Book with same title and ISBN exists.'
       );
     }
 
     let model = Object.assign(bookInfo, {
       owner,
+      authors: authors,
+      publisher: publisher
     });
 
     if (longitude && latitude) {
       model = Object.assign(model, {
         location: {
           type: 'Point',
-          coordinates: [longitude, latitude],
-        },
+          coordinates: [longitude, latitude]
+        }
       });
     }
 
@@ -210,24 +212,24 @@ export class BooksService {
         {
           title: {
             $regex: details.title,
-            $options: 'i',
-          },
+            $options: 'i'
+          }
         },
         {
           $or: [
             { isbn: details.isbn },
             { isbn: details.isbn13 },
             { isbn13: details.isbn },
-            { isbn13: details.isbn13 },
-          ],
-        },
-      ],
+            { isbn13: details.isbn13 }
+          ]
+        }
+      ]
     });
 
     if (book) {
       throw new ConflictException(
         null,
-        'Book with same title and ISBN exists.',
+        'Book with same title and ISBN exists.'
       );
     }
 
@@ -238,9 +240,9 @@ export class BooksService {
         publisher,
         location: {
           type: 'Point',
-          coordinates: [details.longitude, details.latitude],
-        },
-      }),
+          coordinates: [details.longitude, details.latitude]
+        }
+      })
     );
     return book.save();
   }
@@ -248,11 +250,11 @@ export class BooksService {
   async borrowBook(
     ownerId: any,
     bookId: string,
-    borrowerName: string,
+    borrowerName: string
   ): Promise<Book> {
     const book = await this.bookModel.findOne({
       owner: ownerId,
-      _id: bookId,
+      _id: bookId
     });
 
     if (!book) {
@@ -270,7 +272,7 @@ export class BooksService {
     book.isAvailable = false;
     book.borrowingHistory.push({
       borrowedBy: borrowerName,
-      borrowedAt: new Date(),
+      borrowedAt: new Date()
     });
     await book.save();
 
@@ -280,7 +282,7 @@ export class BooksService {
   async returnBook(ownerId: any, bookId: string): Promise<Book> {
     const book = await this.bookModel.findOne({
       owner: ownerId,
-      _id: bookId,
+      _id: bookId
     });
 
     if (!book) {
@@ -290,7 +292,7 @@ export class BooksService {
     if (book.isAvailable) {
       throw new BadRequestException(
         null,
-        'An available book cannot be returned.',
+        'An available book cannot be returned.'
       );
     }
 

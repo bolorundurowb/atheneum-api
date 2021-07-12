@@ -3,7 +3,7 @@
  */
 
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { User } from '../../users/schemas/user.schema';
 import { Author } from './author.schema';
 import { Publisher } from './publisher.schema';
@@ -31,7 +31,10 @@ export class Book {
   @Prop()
   isbn13: string;
 
-  @Prop({ default: 'https://res.cloudinary.com/dg2dgzbt4/image/upload/v1625842121/external_assets/open_source/icons/default-book-cover.png' })
+  @Prop({
+    default:
+      'https://res.cloudinary.com/dg2dgzbt4/image/upload/v1625842121/external_assets/open_source/icons/default-book-cover.png'
+  })
   coverArt: string;
 
   @Prop()
@@ -48,7 +51,7 @@ export class Book {
 
   @Prop({
     type: { type: String, enum: ['Point'], required: false },
-    coordinates: { type: [Number], required: false },
+    coordinates: { type: [Number], required: false }
   })
   location: any;
 
@@ -60,11 +63,18 @@ export class Book {
       {
         borrowedBy: { type: String },
         borrowedAt: { type: Date },
-        returnedAt: { type: Date },
-      },
-    ]),
+        returnedAt: { type: Date }
+      }
+    ])
   )
   borrowingHistory: Array<Record<string, any>>;
 }
 
 export const BookSchema = SchemaFactory.createForClass(Book);
+
+// BookSchema.virtual('publisher_', {
+//   ref: 'Publisher',
+//   localField: 'publisher',
+//   foreignField: '_id',
+//   justOne: true
+// });
