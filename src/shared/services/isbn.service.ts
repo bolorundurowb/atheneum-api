@@ -31,7 +31,7 @@ export class IsbnService {
         externalId: data.id,
         authors: volInfo.authors || [undefined],
         publisher: volInfo.publisher,
-        publishYear: +volInfo.publishedDate,
+        publishYear: volInfo.publishedDate && /^\d+$/.test(volInfo.publishedDate) ? +volInfo.publishedDate : 0,
         summary: volInfo.description,
         title: volInfo.title,
         isbn: volInfo.industryIdentifiers.filter((x) => x.type === 'ISBN_10')[0]
