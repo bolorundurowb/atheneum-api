@@ -22,7 +22,7 @@ import { BorrowBookDto } from './dtos/borrow-book.dto';
 export class BooksController {
   constructor(private bookService: BooksService) {}
 
-  @Get()
+  @Get('')
   async getAll(@Request() req, @Query() qm: BookQueryDto) {
     const userId = req.user.id;
     return this.bookService.getAll(userId, qm);

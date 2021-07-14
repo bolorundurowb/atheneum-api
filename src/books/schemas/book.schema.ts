@@ -33,7 +33,7 @@ export class Book {
 
   @Prop({
     default:
-      'https://res.cloudinary.com/dg2dgzbt4/image/upload/v1625842121/external_assets/open_source/icons/default-book-cover.png'
+      'https://res.cloudinary.com/dg2dgzbt4/image/upload/v1626269455/external_assets/open_source/images/rsz_no-book-image.jpg'
   })
   coverArt: string;
 
@@ -71,10 +71,3 @@ export class Book {
 }
 
 export const BookSchema = SchemaFactory.createForClass(Book);
-
-// BookSchema.virtual('publisher_', {
-//   ref: 'Publisher',
-//   localField: 'publisher',
-//   foreignField: '_id',
-//   justOne: true
-// });
