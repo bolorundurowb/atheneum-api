@@ -28,9 +28,18 @@ export class PublisherService {
   async getTop(ownerId: any): Promise<Array<any>> {
     const result = await this.bookModel.aggregate([
       { $match: { owner: ownerId } },
-      { $group: { _id: '$owner' } },
-      { $project: { publisherId: '$_id' } }
+      { $group: { _id: '$publisher', numOfBooks: { $sum: 1 } } },
+      { $sort: { numOfBooks: -1 } },
+      { $limit: 5 }
     ]);
-    return result;
+
+    const populatedResult = await this.publisherModel.populate(result, {
+      path: '_id'
+    });
+
+    return populatedResult.map((x) => {
+      // @ts-ignore
+      return { publisher: x._id, numOfBooks: x.numOfBooks };
+    });
   }
 }
