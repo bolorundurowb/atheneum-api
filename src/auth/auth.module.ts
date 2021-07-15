@@ -16,12 +16,12 @@ import { SharedModule } from '../shared/shared.module';
     JwtModule.registerAsync({
       useFactory: async () => ({
         secretOrPrivateKey: configuration().auth.secret,
-        signOptions: { expiresIn: '30d' },
-      }),
-    }),
+        signOptions: { expiresIn: '365d' }
+      })
+    })
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
-  exports: [PassportModule, JwtModule],
+  exports: [PassportModule, JwtModule]
 })
 export class AuthModule {}
