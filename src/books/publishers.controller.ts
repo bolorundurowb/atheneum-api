@@ -13,9 +13,15 @@ import { PublisherService } from './services/publisher.service';
 export class PublishersController {
   constructor(private publisherService: PublisherService) {}
 
-  @Get()
+  @Get('')
   async getAll(@Request() req) {
     const userId = req.user.id;
     return this.publisherService.getAll(userId);
+  }
+
+  @Get('top')
+  async getTop(@Request() req) {
+    const userId = req.user.id;
+    return this.publisherService.getTop(userId);
   }
 }
