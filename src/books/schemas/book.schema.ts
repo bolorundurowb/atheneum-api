@@ -59,7 +59,7 @@ export class Book {
   isAvailable: boolean;
 
   @Prop({ type: Date, default: new Date() })
-  createAt: Date;
+  createdAt: Date;
 
   @Prop(
     raw([
