@@ -321,4 +321,11 @@ export class BooksService {
       .sort({ createdAt: 'desc' })
       .limit(5);
   }
+
+  async remove(ownerId: any, bookId: any): Promise<void> {
+    await this.bookModel.findOneAndRemove({
+      owner: ownerId,
+      _id: bookId
+    });
+  }
 }
