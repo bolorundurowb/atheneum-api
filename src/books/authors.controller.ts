@@ -18,4 +18,10 @@ export class AuthorsController {
     const userId = req.user.id;
     return this.authorService.getAll(userId);
   }
+
+  @Get('top')
+  async getTop(@Request() req) {
+    const userId = req.user.id;
+    return this.authorService.getTop(userId);
+  }
 }

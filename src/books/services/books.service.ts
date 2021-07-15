@@ -310,4 +310,15 @@ export class BooksService {
 
     return book;
   }
+
+  async getRecent(ownerId: any): Promise<Array<Book>> {
+    return this.bookModel
+      .find({
+        owner: ownerId
+      })
+      .populate('authors', 'name')
+      .populate('publisher', 'name')
+      .sort({ createdAt: 'desc' })
+      .limit(5);
+  }
 }

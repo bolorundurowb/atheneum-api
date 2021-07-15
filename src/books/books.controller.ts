@@ -6,7 +6,7 @@ import {
   Post,
   Query,
   Request,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { BooksService } from './services/books.service';
@@ -28,6 +28,12 @@ export class BooksController {
     return this.bookService.getAll(userId, qm);
   }
 
+  @Get('recent')
+  async getRecent(@Request() req) {
+    const userId = req.user.id;
+    return this.bookService.getRecent(userId);
+  }
+
   @Post('isbn')
   async createFromIsbn(@Request() req, @Body() payload: BookIsbnDto) {
     const userId = req.user.id;
@@ -35,7 +41,7 @@ export class BooksController {
       userId,
       payload.isbn,
       payload.longitude,
-      payload.latitude,
+      payload.latitude
     );
   }
 
@@ -49,17 +55,14 @@ export class BooksController {
   async borrowBook(
     @Request() req,
     @Param('bookId') bookId: string,
-    @Body() payload: BorrowBookDto,
+    @Body() payload: BorrowBookDto
   ) {
     const userId = req.user.id;
     return this.bookService.borrowBook(userId, bookId, payload.borrowerName);
   }
 
   @Post(':bookId/return')
-  async returnBook(
-    @Request() req,
-    @Param('bookId') bookId: string,
-  ) {
+  async returnBook(@Request() req, @Param('bookId') bookId: string) {
     const userId = req.user.id;
     return this.bookService.returnBook(userId, bookId);
   }
