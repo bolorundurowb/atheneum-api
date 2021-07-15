@@ -316,6 +316,8 @@ export class BooksService {
       .find({
         owner: ownerId
       })
+      .populate('authors', 'name')
+      .populate('publisher', 'name')
       .sort({ createdAt: 'desc' })
       .limit(5);
   }
