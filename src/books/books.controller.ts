@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -65,5 +66,11 @@ export class BooksController {
   async returnBook(@Request() req, @Param('bookId') bookId: string) {
     const userId = req.user.id;
     return this.bookService.returnBook(userId, bookId);
+  }
+
+  @Delete(':bookId')
+  async removeBook(@Request() req, @Param('bookId') bookId: string) {
+    const userId = req.user.id;
+    await this.bookService.remove(userId, bookId);
   }
 }
