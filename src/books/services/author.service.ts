@@ -29,7 +29,7 @@ export class AuthorService {
     const result = await this.bookModel.aggregate([
       { $match: { owner: ownerId } },
       { $unwind: '$authors' },
-      { $group: { _id: 'authors', numOfBooks: { $sum: 1 } } },
+      { $group: { _id: '$authors', numOfBooks: { $sum: 1 } } },
       { $sort: { numOfBooks: -1 } },
       { $limit: 5 }
     ]);
