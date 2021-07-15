@@ -310,4 +310,13 @@ export class BooksService {
 
     return book;
   }
+
+  async getTopRecent(ownerId: any): Promise<Array<Book>> {
+    return this.bookModel
+      .find({
+        owner: ownerId
+      })
+      .sort({ createdAt: 'desc' })
+      .limit(5);
+  }
 }
