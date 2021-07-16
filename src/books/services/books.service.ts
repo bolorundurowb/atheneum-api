@@ -177,7 +177,7 @@ export class BooksService {
     return book.save();
   }
 
-  async addManual(ownerId: string, details: BookManualDto): Promise<Book> {
+  async addManual(ownerId: any, details: BookManualDto): Promise<Book> {
     // find the owner
     const owner = await this.userService.findById(ownerId);
 
@@ -210,6 +210,7 @@ export class BooksService {
     // see if book exists
     let book = await this.bookModel.findOne({
       $and: [
+        { owner: ownerId },
         {
           title: {
             $regex: details.title,
