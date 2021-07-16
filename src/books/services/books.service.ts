@@ -67,7 +67,7 @@ export class BooksService {
   }
 
   async addByIsbn(
-    ownerId: string,
+    ownerId: any,
     isbn: string,
     longitude?: number,
     latitude?: number
@@ -133,6 +133,7 @@ export class BooksService {
     // see if book exists
     let book = await this.bookModel.findOne({
       $and: [
+        { owner: ownerId },
         {
           title: {
             $regex: bookInfo.title,
