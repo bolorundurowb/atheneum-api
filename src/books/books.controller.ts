@@ -9,7 +9,7 @@ import {
   Request,
   UseGuards
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { BooksService } from './services/books.service';
 import { BookIsbnDto } from './dtos/book-isbn.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -30,6 +30,10 @@ export class BooksController {
   }
 
   @Get('count')
+  @ApiOkResponse({
+    description: 'Number of books owned by the user',
+    type: Number
+  })
   async getAllCount(@Request() req) {
     const userId = req.user.id;
     return this.bookService.getAllCount(userId);
