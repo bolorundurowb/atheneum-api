@@ -29,6 +29,12 @@ export class BooksController {
     return this.bookService.getAll(userId, qm);
   }
 
+  @Get('count')
+  async getAllCount(@Request() req) {
+    const userId = req.user.id;
+    return this.bookService.getAllCount(userId);
+  }
+
   @Get('recent')
   async getRecent(@Request() req) {
     const userId = req.user.id;
