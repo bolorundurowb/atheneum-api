@@ -66,6 +66,10 @@ export class BooksService {
       .limit(Number(qm.limit || 30));
   }
 
+  async getAllCount(ownerId: any): Promise<number> {
+    return this.bookModel.countDocuments({ owner: ownerId });
+  }
+
   async addByIsbn(
     ownerId: any,
     isbn: string,
