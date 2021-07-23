@@ -40,6 +40,9 @@ export class Book {
   @Prop()
   publishYear: number;
 
+  @Prop()
+  source: string;
+
   @Prop({ type: String, ref: 'User' })
   owner: User;
 

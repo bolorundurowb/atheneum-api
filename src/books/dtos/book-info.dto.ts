@@ -13,4 +13,5 @@ export class BookInfoDto {
   publisher: string;
   coverArt?: string;
   pageCount?: number;
+  source: string;
 }

@@ -42,7 +42,8 @@ export class GoogleIsbnService {
           (x) => x.type === 'ISBN_13'
         )[0]?.identifier,
         coverArt: volInfo.imageLinks?.thumbnail,
-        pageCount: volInfo.pageCount
+        pageCount: volInfo.pageCount,
+        source: 'Google Books'
       };
     } catch (err) {
       this.logger.error(
