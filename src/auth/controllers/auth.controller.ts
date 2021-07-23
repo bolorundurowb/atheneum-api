@@ -1,6 +1,6 @@
 import { Controller, Post, Body } from '@nestjs/common';
-import { AuthService } from './services/auth.service';
-import { CredentialsDto } from './dtos/credentials.dto';
+import { AuthService } from '../services/auth.service';
+import { CredentialsDto } from '../dtos/credentials.dto';
 import {
   ApiBadRequestResponse,
   ApiConflictResponse,
@@ -10,11 +10,11 @@ import {
   ApiTags,
   ApiUnauthorizedResponse
 } from '@nestjs/swagger';
-import { AuthDto } from './dtos/auth.dto';
-import { ForgotPasswordDto } from './dtos/forgot-password.dto';
-import { MessageDto } from './dtos/message.dto';
-import { ResetPasswordDto } from './dtos/reset-password.dto';
-import { RegisterDto } from './dtos/register.dto';
+import { AuthDto } from '../dtos/auth.dto';
+import { ForgotPasswordDto } from '../dtos/forgot-password.dto';
+import { MessageDto } from '../dtos/message.dto';
+import { ResetPasswordDto } from '../dtos/reset-password.dto';
+import { RegisterDto } from '../dtos/register.dto';
 
 @ApiTags('Auth')
 @Controller('v1/auth')

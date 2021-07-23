@@ -40,6 +40,9 @@ export class Book {
   @Prop()
   publishYear: number;
 
+  @Prop()
+  source: string;
+
   @Prop({ type: String, ref: 'User' })
   owner: User;
 
@@ -49,16 +52,10 @@ export class Book {
   @Prop({ type: String, ref: 'Publisher' })
   publisher: Publisher;
 
-  @Prop({
-    type: { type: String, enum: ['Point'], required: false },
-    coordinates: { type: [Number], required: false }
-  })
-  location: any;
-
   @Prop({ type: Boolean, default: true })
   isAvailable: boolean;
 
-  @Prop({ type: Date, default: new Date() })
+  @Prop({ type: Date, default: Date.now })
   createdAt: Date;
 
   @Prop(
