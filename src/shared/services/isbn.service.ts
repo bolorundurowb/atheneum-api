@@ -2,53 +2,29 @@
  * Created by bolorundurowb on 1/2/2021
  */
 
-import { HttpService, Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BookInfoDto } from '../../books/dtos/book-info.dto';
+import { GoogleIsbnService } from './google-isbn.service';
+import { OpenLibraryIsbnService } from './open-library-isbn.service';
 
 @Injectable()
 export class IsbnService {
-  private readonly baseUrl =
-    'https://www.googleapis.com/books/v1/volumes?q=isbn:';
-  private readonly logger = new Logger(IsbnService.name);
-
-  constructor(private httpService: HttpService) {
-  }
+  constructor(
+    private googleIsbnService: GoogleIsbnService,
+    private openLibIsbnService: OpenLibraryIsbnService
+  ) {}
 
   async getBookByIsbn(isbn: string): Promise<BookInfoDto> {
-    try {
-      const response = await this.httpService
-        .get<any>(`${this.baseUrl}${isbn}`)
-        .toPromise();
-      const items = response.data?.items || [];
-      const data = items[0];
+    let book;
 
-      if (!data) {
-        return null;
-      }
+    // first try to use the open library
+    book = await this.openLibIsbnService.search(isbn);
 
-      const volInfo = data.volumeInfo;
-      return {
-        externalId: data.id,
-        authors: volInfo.authors || ['No Author'],
-        publisher: volInfo.publisher,
-        publishYear: volInfo.publishedDate && /^\d+$/.test(volInfo.publishedDate) ? +volInfo.publishedDate : 0,
-        summary: volInfo.description,
-        title: volInfo.title,
-        isbn: volInfo.industryIdentifiers.filter((x) => x.type === 'ISBN_10')[0]
-          ?.identifier,
-        isbn13: volInfo.industryIdentifiers.filter(
-          (x) => x.type === 'ISBN_13',
-        )[0]?.identifier,
-        coverArt: volInfo.imageLinks?.thumbnail,
-        pageCount: volInfo.pageCount,
-      };
-    } catch (err) {
-      this.logger.error(
-        'An error occurred when retrieving external book info.',
-        err,
-      );
-
-      return null;
+    // if book not found, try the google service
+    if (!book) {
+      book = await this.googleIsbnService.search(isbn);
     }
+
+    return book;
   }
 }
