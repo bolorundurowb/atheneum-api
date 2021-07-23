@@ -27,6 +27,10 @@ export class WishListService {
       .sort({ title: 'asc' });
   }
 
+  async getAllCount(ownerId: any): Promise<number> {
+    return this.wishListModel.countDocuments({ owner: ownerId });
+  }
+
   async add(ownerId: string, details: AddBookDto): Promise<any> {
     // find the owner
     const owner = await this.userService.findById(ownerId);

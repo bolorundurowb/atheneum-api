@@ -16,5 +16,6 @@ import { SharedModule } from '../shared/shared.module';
       { name: WishList.name, schema: WishListSchema },
     ]),
   ],
+  exports: [WishListService]
 })
 export class WishListModule {}
