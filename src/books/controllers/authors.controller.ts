@@ -4,8 +4,8 @@
 
 import { Controller, Get, Request, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { AuthorService } from './services/author.service';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { AuthorService } from '../services/author.service';
 
 @ApiTags('Authors')
 @UseGuards(JwtAuthGuard)

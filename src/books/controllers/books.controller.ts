@@ -10,12 +10,12 @@ import {
   UseGuards
 } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { BooksService } from './services/books.service';
-import { BookIsbnDto } from './dtos/book-isbn.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { BookManualDto } from './dtos/book-manual.dto';
-import { BookQueryDto } from './dtos/book-query.dto';
-import { BorrowBookDto } from './dtos/borrow-book.dto';
+import { BooksService } from '../services/books.service';
+import { BookIsbnDto } from '../dtos/book-isbn.dto';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { BookManualDto } from '../dtos/book-manual.dto';
+import { BookQueryDto } from '../dtos/book-query.dto';
+import { BorrowBookDto } from '../dtos/borrow-book.dto';
 
 @ApiTags('Books')
 @UseGuards(JwtAuthGuard)

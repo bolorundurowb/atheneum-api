@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { BooksService } from './services/books.service';
-import { BooksController } from './books.controller';
+import { BooksController } from './controllers/books.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Book, BookSchema } from './schemas/book.schema';
 import { Author, AuthorSchema } from './schemas/author.schema';
 import { Publisher, PublisherSchema } from './schemas/publisher.schema';
 import { UsersModule } from '../users/users.module';
-import { PublishersController } from './publishers.controller';
+import { PublishersController } from './controllers/publishers.controller';
 import { PublisherService } from './services/publisher.service';
 import { AuthorService } from './services/author.service';
-import { AuthorsController } from './authors.controller';
+import { AuthorsController } from './controllers/authors.controller';
 import { SharedModule } from '../shared/shared.module';
 
 @Module({
