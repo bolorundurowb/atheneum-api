@@ -21,8 +21,9 @@ import { SharedModule } from '../shared/shared.module';
     MongooseModule.forFeature([
       { name: Book.name, schema: BookSchema },
       { name: Author.name, schema: AuthorSchema },
-      { name: Publisher.name, schema: PublisherSchema },
-    ]),
+      { name: Publisher.name, schema: PublisherSchema }
+    ])
   ],
+  exports: [BooksService, AuthorService, PublisherService]
 })
 export class BooksModule {}
