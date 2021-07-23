@@ -6,6 +6,7 @@ import { BooksModule } from './books/books.module';
 import { WishListModule } from './wish-list/wish-list.module';
 import configuration from './config/configuration';
 import { SharedModule } from './shared/shared.module';
+import { StatisticsModule } from './statistics/statistics.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { SharedModule } from './shared/shared.module';
     BooksModule,
     SharedModule,
     WishListModule,
+    StatisticsModule
   ],
 })
 export class AppModule {}

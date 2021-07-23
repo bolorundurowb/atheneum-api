@@ -25,6 +25,10 @@ export class AuthorService {
       .sort({ name: 'asc' });
   }
 
+  async getAllCount(ownerId: any): Promise<number> {
+    return this.authorModel.countDocuments({ owner: ownerId });
+  }
+
   async getTop(ownerId: any): Promise<Array<any>> {
     const result = await this.bookModel.aggregate([
       { $match: { owner: ownerId } },

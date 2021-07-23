@@ -9,9 +9,9 @@ import {
   Param
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { WishListService } from './services/wish-list.service';
-import { AddBookDto } from './dtos/add-book.dto';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { WishListService } from '../services/wish-list.service';
+import { AddBookDto } from '../dtos/add-book.dto';
 
 @ApiTags('Wish List')
 @UseGuards(JwtAuthGuard)

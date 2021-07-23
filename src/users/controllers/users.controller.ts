@@ -5,12 +5,12 @@ import {
   ApiOkResponse,
   ApiTags
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { UserProfileDto } from './dtos/user-profile.dto';
-import { UsersService } from './services/users.service';
-import { PasswordUpdateDto } from './dtos/password-update.dto';
-import { MessageDto } from '../auth/dtos/message.dto';
-import { User } from './schemas/user.schema';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { UserProfileDto } from '../dtos/user-profile.dto';
+import { UsersService } from '../services/users.service';
+import { PasswordUpdateDto } from '../dtos/password-update.dto';
+import { MessageDto } from '../../auth/dtos/message.dto';
+import { User } from '../schemas/user.schema';
 
 @ApiTags('Users')
 @UseGuards(JwtAuthGuard)
