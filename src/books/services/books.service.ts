@@ -108,8 +108,7 @@ export class BooksService {
     // find the authors or create if they dont exist
     const authors = [];
 
-    for (let authorName of bookInfo.authors) {
-      authorName = authorName || 'No Author';
+    for (const authorName of bookInfo.authors) {
       let author = await this.authorModel.findOne({
         owner,
         name: {

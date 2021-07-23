@@ -1,20 +1,19 @@
 /**
- * Created by bolorundurowb on 1/2/2021
+ * Created by bolorundurowb on 7/23/2021
  */
 
 import { HttpService, Injectable, Logger } from '@nestjs/common';
 import { BookInfoDto } from '../../books/dtos/book-info.dto';
 
 @Injectable()
-export class IsbnService {
+export class GoogleIsbnService {
   private readonly baseUrl =
     'https://www.googleapis.com/books/v1/volumes?q=isbn:';
-  private readonly logger = new Logger(IsbnService.name);
+  private readonly logger = new Logger(GoogleIsbnService.name);
 
-  constructor(private httpService: HttpService) {
-  }
+  constructor(private httpService: HttpService) {}
 
-  async getBookByIsbn(isbn: string): Promise<BookInfoDto> {
+  async search(isbn: string): Promise<BookInfoDto> {
     try {
       const response = await this.httpService
         .get<any>(`${this.baseUrl}${isbn}`)
@@ -31,21 +30,24 @@ export class IsbnService {
         externalId: data.id,
         authors: volInfo.authors || ['No Author'],
         publisher: volInfo.publisher,
-        publishYear: volInfo.publishedDate && /^\d+$/.test(volInfo.publishedDate) ? +volInfo.publishedDate : 0,
+        publishYear:
+          volInfo.publishedDate && /^\d+$/.test(volInfo.publishedDate)
+            ? +volInfo.publishedDate
+            : 0,
         summary: volInfo.description,
         title: volInfo.title,
         isbn: volInfo.industryIdentifiers.filter((x) => x.type === 'ISBN_10')[0]
           ?.identifier,
         isbn13: volInfo.industryIdentifiers.filter(
-          (x) => x.type === 'ISBN_13',
+          (x) => x.type === 'ISBN_13'
         )[0]?.identifier,
         coverArt: volInfo.imageLinks?.thumbnail,
-        pageCount: volInfo.pageCount,
+        pageCount: volInfo.pageCount
       };
     } catch (err) {
       this.logger.error(
-        'An error occurred when retrieving external book info.',
-        err,
+        'An error occurred when retrieving external book info from Google.',
+        err
       );
 
       return null;
