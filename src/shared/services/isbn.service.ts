@@ -2,16 +2,20 @@
  * Created by bolorundurowb on 1/2/2021
  */
 
-import { Injectable } from '@nestjs/common';
+import { HttpService, Injectable } from '@nestjs/common';
 import { BookInfoDto } from '../../books/dtos/book-info.dto';
 import { GoogleIsbnService } from './google-isbn.service';
 import { OpenLibraryIsbnService } from './open-library-isbn.service';
+import * as $ from 'cheerio';
 
 @Injectable()
 export class IsbnService {
+  private readonly isbnSearchBaseUrl = 'https://www.google.com/search?q=';
+
   constructor(
     private googleIsbnService: GoogleIsbnService,
-    private openLibIsbnService: OpenLibraryIsbnService
+    private openLibIsbnService: OpenLibraryIsbnService,
+    private httpService: HttpService
   ) {}
 
   async getBookByIsbn(isbn: string): Promise<BookInfoDto> {
@@ -26,5 +30,14 @@ export class IsbnService {
     }
 
     return book;
+  }
+
+  async findIsbnByTitle(title: string): Promise<string> {
+    const encodedTitle = encodeURI(title + ' isbn');
+    const queryUrl = `${this.isbnSearchBaseUrl}${encodedTitle}`;
+    console.log(title, encodedTitle, queryUrl);
+    const response = await this.httpService.get<any>(queryUrl).toPromise();
+
+return response.data;
   }
 }

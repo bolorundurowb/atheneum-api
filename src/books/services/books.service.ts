@@ -319,4 +319,8 @@ export class BooksService {
       _id: bookId
     });
   }
+
+  async searchByTitle(title: string): Promise<string> {
+    return this.isbnService.findIsbnByTitle(title);
+  }
 }

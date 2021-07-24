@@ -79,4 +79,9 @@ export class BooksController {
     const userId = req.user.id;
     await this.bookService.remove(userId, bookId);
   }
+
+  @Get('test')
+  async getATest(@Query() query: any): Promise<string> {
+    return this.bookService.searchByTitle(query.title);
+  }
 }
