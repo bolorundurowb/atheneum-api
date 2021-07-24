@@ -1,8 +1,9 @@
 /**
  * Created by bolorundurowb on 1/3/2021
  */
+
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsOptional, MaxLength, MinLength } from 'class-validator';
 
 export class BookManualDto {
   @ApiProperty()
@@ -15,34 +16,22 @@ export class BookManualDto {
 
   @ApiProperty()
   @IsNotEmpty()
+  @MinLength(10)
+  @MaxLength(13)
   isbn: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  isbn13: string;
 
   @ApiProperty()
   publishYear: number;
 
   @ApiProperty()
   @IsNotEmpty()
-  authorIds: Array<string>;
+  authors: string;
 
   @ApiProperty()
   @IsNotEmpty()
-  publisherId: string;
+  publisher: string;
 
   @ApiProperty()
-  coverArt?: string;
-
-  @ApiProperty()
+  @IsOptional()
   pageCount?: number;
-
-  @ApiProperty()
-  @IsOptional()
-  longitude?: number;
-
-  @ApiProperty()
-  @IsOptional()
-  latitude?: number;
 }
