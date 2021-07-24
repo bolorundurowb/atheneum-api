@@ -3,7 +3,7 @@
  */
 
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, MaxLength, MinLength } from 'class-validator';
+import { IsNotEmpty, IsNumberString, IsOptional, MaxLength, MinLength } from 'class-validator';
 
 export class BookManualDto {
   @ApiProperty()
@@ -18,17 +18,16 @@ export class BookManualDto {
   @IsNotEmpty()
   @MinLength(10)
   @MaxLength(13)
+  @IsNumberString()
   isbn: string;
 
   @ApiProperty()
   publishYear: number;
 
   @ApiProperty()
-  @IsNotEmpty()
   authors: string;
 
   @ApiProperty()
-  @IsNotEmpty()
   publisher: string;
 
   @ApiProperty()

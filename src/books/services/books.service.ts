@@ -165,67 +165,71 @@ export class BooksService {
 
     // if an isbn is provided
     if (details.isbn) {
-    }
+      const book = await this.bookModel.findOne({
+        $and: [
+          { owner: ownerId },
+          {
+            $or: [{ isbn: details.isbn }, { isbn13: details.isbn }]
+          }
+        ]
+      });
 
-    // find the publisher and exit if they dont exist
-    const publisher = await this.publisherModel.findById(details.publisherId);
-
-    if (!publisher) {
-      throw new NotFoundException(null, 'Publisher was not found.');
-    }
-
-    // find the authors and exit if they dont exist
-    const authors = [];
-
-    for (const authorId of details.authorIds) {
-      const author = await this.authorModel.findById(authorId);
-
-      if (author) {
-        authors.push(author);
+      if (book) {
+        throw new ConflictException(
+          null,
+          'Book with same ISBN exists in your library.'
+        );
       }
     }
 
-    if (authors.length <= 0) {
-      throw new NotFoundException(null, 'No authors found.');
-    }
-
-    // see if book exists
-    let book = await this.bookModel.findOne({
-      $and: [
-        { owner: ownerId },
-        {
-          title: {
-            $regex: details.title,
-            $options: 'i'
-          }
-        },
-        {
-          $or: [
-            { isbn: details.isbn },
-            { isbn: details.isbn13 },
-            { isbn13: details.isbn },
-            { isbn13: details.isbn13 }
-          ]
-        }
-      ]
+    // find the publisher or create if they dont exist
+    const publisherName = details.publisher || 'No Publisher';
+    let publisher = await this.publisherModel.findOne({
+      owner,
+      name: {
+        $regex: publisherName,
+        $options: 'i'
+      }
     });
 
-    if (book) {
-      throw new ConflictException(
-        null,
-        'Book with same title and ISBN exists.'
-      );
+    if (!publisher) {
+      publisher = new this.publisherModel({
+        owner,
+        name: publisherName
+      });
+      await publisher.save();
     }
 
-    book = new this.bookModel(
+    // find the authors and exit if they dont exist
+    details.authors = details.authors || 'No Author';
+    const authors = [];
+
+    for (const authorName of details.authors.split(',')) {
+      let author = await this.authorModel.findOne({
+        owner,
+        name: {
+          $regex: authorName,
+          $options: 'i'
+        }
+      });
+
+      if (!author) {
+        author = new this.authorModel({
+          owner,
+          name: authorName
+        });
+        await author.save();
+      }
+
+      authors.push(author);
+    }
+
+    const book = new this.bookModel(
       Object.assign(details, {
+        isbn13: details.isbn,
         owner,
         authors,
-        publisher,
-        location: {
-          type: 'Point',
-          coordinates: [details.longitude, details.latitude]
-        }
+        publisher
       })
     );
     return book.save();
