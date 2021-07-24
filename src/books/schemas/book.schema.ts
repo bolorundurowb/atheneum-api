@@ -41,6 +41,9 @@ export class Book {
   publishYear: number;
 
   @Prop()
+  pageCount: number;
+
+  @Prop()
   source: string;
 
   @Prop({ type: String, ref: 'User' })
