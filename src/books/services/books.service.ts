@@ -78,6 +78,23 @@ export class BooksService {
       throw new UnauthorizedException();
     }
 
+    // see if book exists
+    let book = await this.bookModel.findOne({
+      $and: [
+        { owner: ownerId },
+        {
+          $or: [{ isbn: isbn }, { isbn13: isbn }]
+        }
+      ]
+    });
+
+    if (book) {
+      throw new ConflictException(
+        null,
+        'Book with same ISBN exists in your library.'
+      );
+    }
+
     const bookInfo = await this.isbnService.getBookByIsbn(isbn);
 
     if (!bookInfo) {
@@ -128,34 +145,6 @@ export class BooksService {
       authors.push(author);
     }
 
-    // see if book exists
-    let book = await this.bookModel.findOne({
-      $and: [
-        { owner: ownerId },
-        {
-          title: {
-            $regex: bookInfo.title,
-            $options: 'i'
-          }
-        },
-        {
-          $or: [
-            { isbn: bookInfo.isbn },
-            { isbn: bookInfo.isbn13 },
-            { isbn13: bookInfo.isbn },
-            { isbn13: bookInfo.isbn13 }
-          ]
-        }
-      ]
-    });
-
-    if (book) {
-      throw new ConflictException(
-        null,
-        'Book with same title and ISBN exists.'
-      );
-    }
-
     const model = Object.assign(bookInfo, {
       owner,
       authors: authors,
@@ -172,6 +161,10 @@ export class BooksService {
 
     if (!owner) {
       throw new UnauthorizedException();
+    }
+
+    // if an isbn is provided
+    if (details.isbn) {
     }
 
     // find the publisher and exit if they dont exist
