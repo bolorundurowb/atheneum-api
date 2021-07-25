@@ -100,7 +100,7 @@ export class BooksService {
     if (!bookInfo) {
       throw new NotFoundException(
         null,
-        'A book with the provided ISBN does not exist.'
+        'Our sources do not have a book with the provided ISBN.'
       );
     }
 
