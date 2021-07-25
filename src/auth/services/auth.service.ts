@@ -28,16 +28,23 @@ export class AuthService {
   async login(emailAddress: string, password: string): Promise<AuthDto> {
     const user = await this.userService.findByEmail(emailAddress);
 
-    if (user && bcrypt.compareSync(password, user.passwordHash)) {
-      return {
-        authToken: this.generateAuthToken(user),
-        firstName: user.firstName,
-        lastName: user.lastName,
-        emailAddress: user.emailAddress
-      };
+    if (!user) {
+      throw new UnauthorizedException(
+        null,
+        'An account does not exist with that email address.'
+      );
     }
 
-    throw new UnauthorizedException(null, 'User account not found.');
+    if (!bcrypt.compareSync(password, user.passwordHash)) {
+      throw new UnauthorizedException(null, 'Wrong password.');
+    }
+
+    return {
+      authToken: this.generateAuthToken(user),
+      firstName: user.firstName,
+      lastName: user.lastName,
+      emailAddress: user.emailAddress
+    };
   }
 
   async register(
