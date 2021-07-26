@@ -9,4 +9,8 @@ export class CodeService {
   public generateResetCode(): string {
     return Math.random().toString().substr(2, 6);
   }
+
+  public generateVerificationCode(): string {
+    return Math.random().toString().substr(2, 6);
+  }
 }

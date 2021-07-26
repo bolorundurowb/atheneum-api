@@ -43,7 +43,8 @@ export class AuthService {
       authToken: this.generateAuthToken(user),
       firstName: user.firstName,
       lastName: user.lastName,
-      emailAddress: user.emailAddress
+      emailAddress: user.emailAddress,
+      isEmailVerified: user.isEmailVerified
     };
   }
 
@@ -60,18 +61,35 @@ export class AuthService {
 
     user = await this.userService.create(emailAddress, password);
 
+    // generate and persist the verification code
+    const verificationCode = this.codeService.generateVerificationCode();
+    user.verificationCode = verificationCode;
+
     if (fullName) {
       const nameParts = fullName.split(' ');
       user.firstName = nameParts[0] || '';
       user.lastName = nameParts[1] || '';
-      await (<UserDocument>user).save();
     }
+
+    await (<UserDocument>user).save();
+
+    // send an email to the user
+    const content = await this.templateService.getWelcomeVerificationContent(
+      user.firstName,
+      verificationCode
+    );
+    await this.emailService.send(
+      user.emailAddress,
+      'Welcome to Atheneum! Verify your email.',
+      content
+    );
 
     return {
       authToken: this.generateAuthToken(user),
       firstName: user.firstName,
       lastName: user.lastName,
-      emailAddress: user.emailAddress
+      emailAddress: user.emailAddress,
+      isEmailVerified: user.isEmailVerified
     };
   }
 
@@ -119,9 +137,25 @@ export class AuthService {
     );
     await this.emailService.send(
       user.emailAddress,
-      'Reset successfully',
+      'Password reset successful',
       content
     );
+  }
+
+  async verifyEmail(userId: any, verificationCode: string): Promise<void> {
+    const user = await this.userService.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException(null, 'User account not found.');
+    }
+
+    if (user.verificationCode !== verificationCode) {
+      throw new BadRequestException(null, 'Reset code does not match.');
+    }
+
+    user.isEmailVerified = true;
+    user.verificationCode = null;
+    await (<UserDocument>user).save();
   }
 
   private generateAuthToken(user: any): string {

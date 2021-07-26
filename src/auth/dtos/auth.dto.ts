@@ -16,4 +16,7 @@ export class AuthDto {
 
   @ApiProperty()
   emailAddress: string;
+
+  @ApiProperty()
+  isEmailVerified: boolean;
 }
