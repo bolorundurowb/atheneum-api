@@ -74,12 +74,13 @@ export class AuthService {
     await (<UserDocument>user).save();
 
     // send an email to the user
-    const content = await this.templateService.getResetPasswordContent(
-      user.firstName
+    const content = await this.templateService.getWelcomeVerificationContent(
+      user.firstName,
+      verificationCode
     );
     await this.emailService.send(
       user.emailAddress,
-      'Reset successfully',
+      'Welcome to Atheneum! Verify your email.',
       content
     );
 
