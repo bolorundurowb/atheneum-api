@@ -73,6 +73,16 @@ export class AuthService {
 
     await (<UserDocument>user).save();
 
+    // send an email to the user
+    const content = await this.templateService.getResetPasswordContent(
+      user.firstName
+    );
+    await this.emailService.send(
+      user.emailAddress,
+      'Reset successfully',
+      content
+    );
+
     return {
       authToken: this.generateAuthToken(user),
       firstName: user.firstName,
@@ -129,6 +139,22 @@ export class AuthService {
       'Reset successfully',
       content
     );
+  }
+
+  async verifyEmail(userId: any, verificationCode: string): Promise<void> {
+    const user = await this.userService.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException(null, 'User account not found.');
+    }
+
+    if (user.verificationCode !== verificationCode) {
+      throw new BadRequestException(null, 'Reset code does not match.');
+    }
+
+    user.isEmailVerified = true;
+    user.verificationCode = null;
+    await (<UserDocument>user).save();
   }
 
   private generateAuthToken(user: any): string {
