@@ -61,12 +61,17 @@ export class AuthService {
 
     user = await this.userService.create(emailAddress, password);
 
+    // generate and persist the verification code
+    const verificationCode = this.codeService.generateVerificationCode();
+    user.verificationCode = verificationCode;
+
     if (fullName) {
       const nameParts = fullName.split(' ');
       user.firstName = nameParts[0] || '';
       user.lastName = nameParts[1] || '';
-      await (<UserDocument>user).save();
     }
+
+    await (<UserDocument>user).save();
 
     return {
       authToken: this.generateAuthToken(user),
