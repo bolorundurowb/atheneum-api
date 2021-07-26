@@ -43,7 +43,8 @@ export class AuthService {
       authToken: this.generateAuthToken(user),
       firstName: user.firstName,
       lastName: user.lastName,
-      emailAddress: user.emailAddress
+      emailAddress: user.emailAddress,
+      isEmailVerified: user.isEmailVerified
     };
   }
 
@@ -71,7 +72,8 @@ export class AuthService {
       authToken: this.generateAuthToken(user),
       firstName: user.firstName,
       lastName: user.lastName,
-      emailAddress: user.emailAddress
+      emailAddress: user.emailAddress,
+      isEmailVerified: user.isEmailVerified
     };
   }
 
