@@ -137,7 +137,7 @@ export class AuthService {
     );
     await this.emailService.send(
       user.emailAddress,
-      'Reset successfully',
+      'Password reset successful',
       content
     );
   }
