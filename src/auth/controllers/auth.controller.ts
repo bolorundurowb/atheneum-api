@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { CredentialsDto } from '../dtos/credentials.dto';
 import {
@@ -15,6 +15,8 @@ import { ForgotPasswordDto } from '../dtos/forgot-password.dto';
 import { MessageDto } from '../dtos/message.dto';
 import { ResetPasswordDto } from '../dtos/reset-password.dto';
 import { RegisterDto } from '../dtos/register.dto';
+import { VerifyEmailDto } from '../dtos/verify-email.dto';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @ApiTags('Auth')
 @Controller('v1/auth')
@@ -88,6 +90,30 @@ export class AuthController {
     );
     return {
       message: 'Password reset successful.'
+    };
+  }
+
+  @Post('verify-email')
+  @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({
+    description: 'Email verified successfully',
+    type: MessageDto
+  })
+  @ApiBadRequestResponse({
+    description: 'The provided verification code was invalid'
+  })
+  @ApiNotFoundResponse({
+    description: 'A user account does not exist for the provided user details'
+  })
+  async verifyEmail(
+    @Request() req,
+    @Body() payload: VerifyEmailDto
+  ): Promise<MessageDto> {
+    const userId = req.user.id;
+    await this.authService.verifyEmail(userId, payload.verificationCode);
+
+    return {
+      message: 'Email verification successful.'
     };
   }
 }
