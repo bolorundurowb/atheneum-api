@@ -3,7 +3,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
+  UnauthorizedException
 } from '@nestjs/common';
 import { UsersService } from '../../users/services/users.service';
 import * as bcrypt from 'bcrypt';
@@ -22,9 +22,8 @@ export class AuthService {
     private jwtService: JwtService,
     private codeService: CodeService,
     private emailService: EmailService,
-    private templateService: TemplateService,
-  ) {
-  }
+    private templateService: TemplateService
+  ) {}
 
   async login(emailAddress: string, password: string): Promise<AuthDto> {
     const user = await this.userService.findByEmail(emailAddress);
@@ -32,7 +31,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException(
         null,
-        'An account does not exist with that email address.',
+        'An account does not exist with that email address.'
       );
     }
 
@@ -45,14 +44,14 @@ export class AuthService {
       firstName: user.firstName,
       lastName: user.lastName,
       emailAddress: user.emailAddress,
-      isEmailVerified: user.isEmailVerified,
+      isEmailVerified: user.isEmailVerified
     };
   }
 
   async register(
     fullName: string,
     emailAddress: string,
-    password: string,
+    password: string
   ): Promise<AuthDto> {
     let user = await this.userService.findByEmail(emailAddress);
 
@@ -77,12 +76,12 @@ export class AuthService {
     // send an email to the user
     const content = this.templateService.getWelcomeVerificationContent(
       user.firstName,
-      verificationCode,
+      verificationCode
     );
     await this.emailService.send(
       user.emailAddress,
       'Welcome to Atheneum! Verify your email.',
-      content,
+      content
     );
 
     return {
@@ -90,7 +89,7 @@ export class AuthService {
       firstName: user.firstName,
       lastName: user.lastName,
       emailAddress: user.emailAddress,
-      isEmailVerified: user.isEmailVerified,
+      isEmailVerified: user.isEmailVerified
     };
   }
 
@@ -108,7 +107,7 @@ export class AuthService {
     // send an email to the user
     const content = this.templateService.getForgotPasswordContent(
       user.firstName,
-      resetCode,
+      resetCode
     );
     await this.emailService.send(user.emailAddress, 'Your reset code', content);
   }
@@ -116,7 +115,7 @@ export class AuthService {
   async resetPassword(
     emailAddress: string,
     resetCode: string,
-    password: string,
+    password: string
   ): Promise<void> {
     const user = await this.userService.findByEmail(emailAddress);
 
@@ -134,12 +133,12 @@ export class AuthService {
 
     // send an email to the user
     const content = this.templateService.getResetPasswordContent(
-      user.firstName,
+      user.firstName
     );
     await this.emailService.send(
       user.emailAddress,
       'Password reset successful',
-      content,
+      content
     );
   }
 
@@ -159,11 +158,35 @@ export class AuthService {
     await (<UserDocument>user).save();
   }
 
+  async resendVerificationCode(userId: any): Promise<void> {
+    const user = await this.userService.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException(null, 'User account not found.');
+    }
+
+    if (!user.verificationCode) {
+      user.verificationCode = this.codeService.generateVerificationCode();
+      await (<UserDocument>user).save();
+    }
+
+    // send an email to the user
+    const content = this.templateService.getWelcomeVerificationContent(
+      user.firstName,
+      user.verificationCode
+    );
+    await this.emailService.send(
+      user.emailAddress,
+      'Welcome to Atheneum! Verify your email.',
+      content
+    );
+  }
+
   private generateAuthToken(user: any): string {
     return this.jwtService.sign({
       email: user.emailAddress,
       id: user._id,
-      sub: uuid(),
+      sub: uuid()
     });
   }
 }
