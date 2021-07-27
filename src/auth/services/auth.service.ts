@@ -14,6 +14,7 @@ import { CodeService } from '../../shared/services/code.service';
 import { UserDocument } from '../../users/schemas/user.schema';
 import { EmailService } from '../../shared/services/email.service';
 import { TemplateService } from '../../shared/services/template.service';
+import { SocialAuthService } from './social-auth.service';
 
 @Injectable()
 export class AuthService {
@@ -22,7 +23,8 @@ export class AuthService {
     private jwtService: JwtService,
     private codeService: CodeService,
     private emailService: EmailService,
-    private templateService: TemplateService
+    private templateService: TemplateService,
+    private socialAuthService: SocialAuthService
   ) {}
 
   async login(emailAddress: string, password: string): Promise<AuthDto> {
@@ -43,6 +45,7 @@ export class AuthService {
       authToken: this.generateAuthToken(user),
       firstName: user.firstName,
       lastName: user.lastName,
+      emailAddress: user.emailAddress,
       emailAddress: user.emailAddress,
       isEmailVerified: user.isEmailVerified
     };

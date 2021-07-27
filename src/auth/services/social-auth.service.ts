@@ -15,7 +15,7 @@ export class SocialAuthService {
   constructor(private httpService: HttpService) {}
 
   async verifyFacebookToken(token): Promise<any> {
-    const userRetrievalUrl = `https://graph.facebook.com/me?fields=id,first_name,last_name,email,gender&access_token=${token}`;
+    const userRetrievalUrl = `https://graph.facebook.com/me?fields=id,first_name,last_name,email&access_token=${token}`;
     const response = await this.httpService
       .get<any>(userRetrievalUrl)
       .toPromise();
