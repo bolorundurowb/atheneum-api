@@ -116,4 +116,22 @@ export class AuthController {
       message: 'Email verification successful.'
     };
   }
+
+  @Post('resend-verification-code')
+  @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({
+    description: 'Email sent successfully',
+    type: MessageDto
+  })
+  @ApiNotFoundResponse({
+    description: 'A user account does not exist for the provided user details'
+  })
+  async resendVerification(@Request() req): Promise<MessageDto> {
+    const userId = req.user.id;
+    await this.authService.resendVerificationCode(userId);
+
+    return {
+      message: 'Verification code successfully resent.'
+    };
+  }
 }
