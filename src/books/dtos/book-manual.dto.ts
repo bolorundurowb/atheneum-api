@@ -11,21 +11,20 @@ export class BookManualDto {
   title: string;
 
   @ApiProperty()
-  @IsNotEmpty()
+  authors: string;
+
+  @ApiProperty()
   summary: string;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
+  @IsNumberString()
   @MinLength(10)
   @MaxLength(13)
-  @IsNumberString()
   isbn: string;
 
   @ApiProperty()
   publishYear: number;
-
-  @ApiProperty()
-  authors: string;
 
   @ApiProperty()
   publisher: string;
