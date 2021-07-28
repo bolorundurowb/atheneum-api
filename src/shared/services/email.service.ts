@@ -25,17 +25,21 @@ export class EmailService {
     sender = 'Atheneum App <atheneum@bolorundurowb.com>',
     attachments: Array<any> = []
   ) {
-    const msg = {
-      to: recipient,
-      from: sender,
-      subject: subject,
-      html: content,
-      attachments: attachments
-    };
+    try {
+      const msg = {
+        to: recipient,
+        from: sender,
+        subject: subject,
+        html: content,
+        attachments: attachments
+      };
 
-    await this.mailgun.messages().send(msg);
-    this.logger.log(
-      `Email with subject '${subject}' sent successfully to '${recipient}'.`
-    );
+      await this.mailgun.messages().send(msg);
+      this.logger.log(
+        `Email with subject '${subject}' sent successfully to '${recipient}'.`
+      );
+    } catch (err) {
+      this.logger.error('An error occurred sending an email', err.stack, err);
+    }
   }
 }

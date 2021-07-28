@@ -27,12 +27,18 @@ export class User {
     set: (value) => {
       const salt = bcrypt.genSaltSync(10);
       return bcrypt.hashSync(value, salt);
-    },
+    }
   })
   passwordHash: string;
 
   @Prop()
   resetCode: string;
+
+  @Prop({ default: false })
+  isEmailVerified: boolean;
+
+  @Prop()
+  verificationCode: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

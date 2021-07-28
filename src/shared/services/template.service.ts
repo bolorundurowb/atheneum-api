@@ -15,7 +15,7 @@ export class TemplateService {
 
     return this.generateHtml(templateName, {
       firstName,
-      resetCode,
+      resetCode
     });
   }
 
@@ -28,16 +28,26 @@ export class TemplateService {
     });
   }
 
+  public getWelcomeVerificationContent(firstName, verificationCode): string {
+    const templateName = 'welcomeVerify';
+    firstName = firstName || 'there';
+
+    return this.generateHtml(templateName, {
+      firstName,
+      verificationCode
+    });
+  }
+
   private generateHtml(templateName, data): string {
     const baseEmailTemplateString = fs.readFileSync(
       path.join(path.dirname(__dirname), 'templates', 'baseEmailTemplate.hbs'),
-      'utf8',
+      'utf8'
     );
     const baseEmailTemplate = handlebars.compile(baseEmailTemplateString);
 
     const templateString = fs.readFileSync(
       path.join(path.dirname(__dirname), 'templates', `${templateName}.hbs`),
-      'utf8',
+      'utf8'
     );
     const template = handlebars.compile(templateString);
 

@@ -28,16 +28,24 @@ export class AuthService {
   async login(emailAddress: string, password: string): Promise<AuthDto> {
     const user = await this.userService.findByEmail(emailAddress);
 
-    if (user && bcrypt.compareSync(password, user.passwordHash)) {
-      return {
-        authToken: this.generateAuthToken(user),
-        firstName: user.firstName,
-        lastName: user.lastName,
-        emailAddress: user.emailAddress
-      };
+    if (!user) {
+      throw new UnauthorizedException(
+        null,
+        'An account does not exist with that email address.'
+      );
     }
 
-    throw new UnauthorizedException(null, 'User account not found.');
+    if (!bcrypt.compareSync(password, user.passwordHash)) {
+      throw new UnauthorizedException(null, 'Wrong password.');
+    }
+
+    return {
+      authToken: this.generateAuthToken(user),
+      firstName: user.firstName,
+      lastName: user.lastName,
+      emailAddress: user.emailAddress,
+      isEmailVerified: user.isEmailVerified
+    };
   }
 
   async register(
@@ -53,18 +61,35 @@ export class AuthService {
 
     user = await this.userService.create(emailAddress, password);
 
+    // generate and persist the verification code
+    const verificationCode = this.codeService.generateVerificationCode();
+    user.verificationCode = verificationCode;
+
     if (fullName) {
       const nameParts = fullName.split(' ');
       user.firstName = nameParts[0] || '';
       user.lastName = nameParts[1] || '';
-      await (<UserDocument>user).save();
     }
+
+    await (<UserDocument>user).save();
+
+    // send an email to the user
+    const content = this.templateService.getWelcomeVerificationContent(
+      user.firstName,
+      verificationCode
+    );
+    await this.emailService.send(
+      user.emailAddress,
+      'Welcome to Atheneum! Verify your email.',
+      content
+    );
 
     return {
       authToken: this.generateAuthToken(user),
       firstName: user.firstName,
       lastName: user.lastName,
-      emailAddress: user.emailAddress
+      emailAddress: user.emailAddress,
+      isEmailVerified: user.isEmailVerified
     };
   }
 
@@ -80,7 +105,7 @@ export class AuthService {
     await (<UserDocument>user).save();
 
     // send an email to the user
-    const content = await this.templateService.getForgotPasswordContent(
+    const content = this.templateService.getForgotPasswordContent(
       user.firstName,
       resetCode
     );
@@ -107,12 +132,52 @@ export class AuthService {
     await (<UserDocument>user).save();
 
     // send an email to the user
-    const content = await this.templateService.getResetPasswordContent(
+    const content = this.templateService.getResetPasswordContent(
       user.firstName
     );
     await this.emailService.send(
       user.emailAddress,
-      'Reset successfully',
+      'Password reset successful',
+      content
+    );
+  }
+
+  async verifyEmail(userId: any, verificationCode: string): Promise<void> {
+    const user = await this.userService.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException(null, 'User account not found.');
+    }
+
+    if (user.verificationCode !== verificationCode) {
+      throw new BadRequestException(null, 'Reset code does not match.');
+    }
+
+    user.isEmailVerified = true;
+    user.verificationCode = null;
+    await (<UserDocument>user).save();
+  }
+
+  async resendVerificationCode(userId: any): Promise<void> {
+    const user = await this.userService.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException(null, 'User account not found.');
+    }
+
+    if (!user.verificationCode) {
+      user.verificationCode = this.codeService.generateVerificationCode();
+      await (<UserDocument>user).save();
+    }
+
+    // send an email to the user
+    const content = this.templateService.getWelcomeVerificationContent(
+      user.firstName,
+      user.verificationCode
+    );
+    await this.emailService.send(
+      user.emailAddress,
+      'Welcome to Atheneum! Verify your email.',
       content
     );
   }
