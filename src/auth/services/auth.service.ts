@@ -77,7 +77,7 @@ export class AuthService {
     await (<UserDocument>user).save();
 
     // send an email to the user
-    const content = await this.templateService.getWelcomeVerificationContent(
+    const content = this.templateService.getWelcomeVerificationContent(
       user.firstName,
       verificationCode
     );
@@ -108,7 +108,7 @@ export class AuthService {
     await (<UserDocument>user).save();
 
     // send an email to the user
-    const content = await this.templateService.getForgotPasswordContent(
+    const content = this.templateService.getForgotPasswordContent(
       user.firstName,
       resetCode
     );
@@ -135,7 +135,7 @@ export class AuthService {
     await (<UserDocument>user).save();
 
     // send an email to the user
-    const content = await this.templateService.getResetPasswordContent(
+    const content = this.templateService.getResetPasswordContent(
       user.firstName
     );
     await this.emailService.send(
@@ -159,6 +159,30 @@ export class AuthService {
     user.isEmailVerified = true;
     user.verificationCode = null;
     await (<UserDocument>user).save();
+  }
+
+  async resendVerificationCode(userId: any): Promise<void> {
+    const user = await this.userService.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException(null, 'User account not found.');
+    }
+
+    if (!user.verificationCode) {
+      user.verificationCode = this.codeService.generateVerificationCode();
+      await (<UserDocument>user).save();
+    }
+
+    // send an email to the user
+    const content = this.templateService.getWelcomeVerificationContent(
+      user.firstName,
+      user.verificationCode
+    );
+    await this.emailService.send(
+      user.emailAddress,
+      'Welcome to Atheneum! Verify your email.',
+      content
+    );
   }
 
   private generateAuthToken(user: any): string {
