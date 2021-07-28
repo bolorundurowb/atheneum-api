@@ -226,6 +226,7 @@ export class BooksService {
 
     const book = new this.bookModel(
       Object.assign(details, {
+        summary: details.summary || details.title,
         isbn13: details.isbn,
         owner,
         authors,
