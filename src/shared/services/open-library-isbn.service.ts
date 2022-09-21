@@ -2,8 +2,9 @@
  * Created by bolorundurowb on 7/23/2021
  */
 
-import { HttpService, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { BookInfoDto } from '../../books/dtos/book-info.dto';
+import {HttpService} from "@nestjs/axios";
 
 @Injectable()
 export class OpenLibraryIsbnService {

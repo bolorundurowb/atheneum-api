@@ -2,8 +2,9 @@
  * Created by bolorundurowb on 7/23/2021
  */
 
-import { HttpService, Injectable, Logger } from '@nestjs/common';
-import { BookInfoDto } from '../../books/dtos/book-info.dto';
+import {Injectable, Logger} from '@nestjs/common';
+import {BookInfoDto} from '../../books/dtos/book-info.dto';
+import {HttpService} from "@nestjs/axios";
 
 @Injectable()
 export class GoogleIsbnService {
@@ -11,7 +12,8 @@ export class GoogleIsbnService {
     'https://www.googleapis.com/books/v1/volumes?q=isbn:';
   private readonly logger = new Logger(GoogleIsbnService.name);
 
-  constructor(private httpService: HttpService) {}
+  constructor(private httpService: HttpService) {
+  }
 
   async search(isbn: string): Promise<BookInfoDto> {
     try {
