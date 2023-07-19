@@ -12,9 +12,7 @@ import { SharedModule } from '../shared/shared.module';
   imports: [
     UsersModule,
     SharedModule,
-    MongooseModule.forFeature([
-      { name: WishList.name, schema: WishListSchema },
-    ]),
+    MongooseModule.forFeature([{ name: WishList.name, schema: WishListSchema }])
   ],
   exports: [WishListService]
 })
