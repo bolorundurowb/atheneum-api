@@ -31,6 +31,14 @@ export class BooksService {
       owner: ownerId
     };
 
+    if (qm.publisherId) {
+      query.publisher = qm.publisherId;
+    }
+
+    if (qm.authorId) {
+      query.authors = qm.authorId;
+    }
+
     if (qm.search) {
       const caseInsensitiveSearch = {
         $regex: new RegExp(qm.search, 'i')
@@ -122,7 +130,7 @@ export class BooksService {
       await publisher.save();
     }
 
-    // find the authors or create if they dont exist
+    // find the authors or create if they don't exist
     const authors = [];
 
     for (const authorName of bookInfo.authors) {
