@@ -2,7 +2,8 @@
  * Created by bolorundurowb on 7/23/2021
  */
 
-import { HttpService, Injectable, Logger } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { Injectable, Logger } from '@nestjs/common';
 import { BookInfoDto } from '../../books/dtos/book-info.dto';
 
 @Injectable()
