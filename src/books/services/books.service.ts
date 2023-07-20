@@ -14,9 +14,13 @@ import { Publisher, PublisherDocument } from '../schemas/publisher.schema';
 import { UsersService } from '../../users/services/users.service';
 import { BookManualDto } from '../dtos/book-manual.dto';
 import { BookQueryDto } from '../dtos/book-query.dto';
+import { User } from '../../users/schemas/user.schema';
 
 @Injectable()
 export class BooksService {
+  readonly DEFAULT_AUTHOR_NAME = 'No Author';
+  readonly DEFAULT_PUBLISHER_NAME = 'No Publisher';
+
   constructor(
     private isbnService: IsbnService,
     private userService: UsersService,
@@ -324,5 +328,67 @@ export class BooksService {
       owner: ownerId,
       _id: bookId
     });
+  }
+
+  private async bookExistsWithIsbn(
+    ownerId: string,
+    isbn: string
+  ): Promise<boolean> {
+    const count = await this.bookModel.countDocuments({
+      $and: [
+        { owner: ownerId },
+        {
+          $or: [{ isbn }, { isbn13: isbn }]
+        }
+      ]
+    });
+    return count > 0;
+  }
+
+  private async getOrCreatePublisher(owner: User, name?: string) {
+    const publisherName = name?.trim() || this.DEFAULT_PUBLISHER_NAME;
+    let publisher = await this.publisherModel.findOne({
+      owner,
+      name: {
+        $regex: publisherName,
+        $options: 'i'
+      }
+    });
+
+    if (!publisher) {
+      publisher = new this.publisherModel({
+        owner,
+        name: publisherName
+      });
+      await publisher.save();
+    }
+
+    return publisher;
+  }
+
+  private async getOrCreateAuthors(owner: User, names: string[]) {
+    const authors = [];
+
+    for (const authorName of names) {
+      let author = await this.authorModel.findOne({
+        owner,
+        name: {
+          $regex: authorName,
+          $options: 'i'
+        }
+      });
+
+      if (!author) {
+        author = new this.authorModel({
+          owner,
+          name: authorName
+        });
+        await author.save();
+      }
+
+      authors.push(author);
+    }
+
+    return authors;
   }
 }
