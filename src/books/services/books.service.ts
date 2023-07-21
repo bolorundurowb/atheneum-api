@@ -74,13 +74,33 @@ export class BooksService {
       query.isAvailable = Boolean(qm.available);
     }
 
-    return this.bookModel
-      .find(query)
-      .sort({ title: 'asc' })
-      .populate('publisher', 'name')
-      .populate('authors', 'name')
-      .skip(Number(qm.skip || 0))
-      .limit(Number(qm.limit || 30));
+    const aggregateQuery = [
+      {
+        $lookup: {
+          from: 'publishers',
+          localField: 'publisher',
+          foreignField: '_id',
+          as: 'publisher'
+        }
+      },
+      {
+        $unwind: '$publisher'
+      },
+      {
+        $lookup: {
+          from: 'authors',
+          localField: 'authors',
+          foreignField: '_id',
+          as: 'authors'
+        }
+      },
+      { $match: query },
+      { $sort: { title: 1 as any } },
+      { $skip: Number(qm.skip) },
+      { $limit: Number(qm.limit) }
+    ];
+
+    return this.bookModel.aggregate(aggregateQuery);
   }
 
   async getAllCount(ownerId: any): Promise<number> {
