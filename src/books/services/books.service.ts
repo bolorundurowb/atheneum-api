@@ -90,17 +90,10 @@ export class BooksService {
       throw new UnauthorizedException();
     }
 
-    // see if book exists
-    let book = await this.bookModel.findOne({
-      $and: [
-        { owner: ownerId },
-        {
-          $or: [{ isbn: isbn }, { isbn13: isbn }]
-        }
-      ]
-    });
+    // avoid isbn conflicts
+    const bookExistsWithIsbn = await this.bookExistsWithIsbn(ownerId, isbn);
 
-    if (book) {
+    if (bookExistsWithIsbn) {
       throw new ConflictException(
         null,
         'Book with same ISBN exists in your library.'
@@ -116,54 +109,22 @@ export class BooksService {
       );
     }
 
-    // find the publisher or create if they dont exist
-    const publisherName = bookInfo.publisher || 'No Publisher';
-    let publisher = await this.publisherModel.findOne({
+    // get the publisher
+    const publisher = await this.getOrCreatePublisher(
       owner,
-      name: {
-        $regex: publisherName,
-        $options: 'i'
-      }
-    });
+      bookInfo.publisher
+    );
 
-    if (!publisher) {
-      publisher = new this.publisherModel({
+    // get the authors
+    const authors = await this.getOrCreateAuthors(owner, bookInfo.authors);
+
+    const book = new this.bookModel(
+      Object.assign(bookInfo, {
         owner,
-        name: publisherName
-      });
-      await publisher.save();
-    }
-
-    // find the authors or create if they don't exist
-    const authors = [];
-
-    for (const authorName of bookInfo.authors) {
-      let author = await this.authorModel.findOne({
-        owner,
-        name: {
-          $regex: authorName,
-          $options: 'i'
-        }
-      });
-
-      if (!author) {
-        author = new this.authorModel({
-          owner,
-          name: authorName
-        });
-        await author.save();
-      }
-
-      authors.push(author);
-    }
-
-    const model = Object.assign(bookInfo, {
-      owner,
-      authors: authors,
-      publisher: publisher
-    });
-
-    book = new this.bookModel(model);
+        authors: authors,
+        publisher: publisher
+      })
+    );
     return book.save();
   }
 
@@ -177,16 +138,13 @@ export class BooksService {
 
     // if an isbn is provided
     if (details.isbn) {
-      const book = await this.bookModel.findOne({
-        $and: [
-          { owner: ownerId },
-          {
-            $or: [{ isbn: details.isbn }, { isbn13: details.isbn }]
-          }
-        ]
-      });
+      // avoid isbn conflicts
+      const bookExistsWithIsbn = await this.bookExistsWithIsbn(
+        ownerId,
+        details.isbn
+      );
 
-      if (book) {
+      if (bookExistsWithIsbn) {
         throw new ConflictException(
           null,
           'Book with same ISBN exists in your library.'
@@ -194,47 +152,14 @@ export class BooksService {
       }
     }
 
-    // find the publisher or create if they dont exist
-    const publisherName = details.publisher || 'No Publisher';
-    let publisher = await this.publisherModel.findOne({
+    // get the publisher
+    const publisher = await this.getOrCreatePublisher(owner, details.publisher);
+
+    // get the authors
+    const authors = await this.getOrCreateAuthors(
       owner,
-      name: {
-        $regex: publisherName,
-        $options: 'i'
-      }
-    });
-
-    if (!publisher) {
-      publisher = new this.publisherModel({
-        owner,
-        name: publisherName
-      });
-      await publisher.save();
-    }
-
-    // find the authors and exit if they dont exist
-    details.authors = details.authors || 'No Author';
-    const authors = [];
-
-    for (const authorName of details.authors.split(',')) {
-      let author = await this.authorModel.findOne({
-        owner,
-        name: {
-          $regex: authorName,
-          $options: 'i'
-        }
-      });
-
-      if (!author) {
-        author = new this.authorModel({
-          owner,
-          name: authorName
-        });
-        await author.save();
-      }
-
-      authors.push(author);
-    }
+      details.authors?.split(',') || []
+    );
 
     const book = new this.bookModel(
       Object.assign(details, {
@@ -367,9 +292,11 @@ export class BooksService {
   }
 
   private async getOrCreateAuthors(owner: User, names: string[]) {
+    const authorNames = names.length > 0 ? names : [this.DEFAULT_AUTHOR_NAME];
     const authors = [];
 
-    for (const authorName of names) {
+    for (let authorName of authorNames) {
+      authorName = authorName.trim();
       let author = await this.authorModel.findOne({
         owner,
         name: {
