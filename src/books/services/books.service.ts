@@ -50,13 +50,13 @@ export class BooksService {
 
       const orQueries: Array<any> = [
         { title: caseInsensitiveSearch },
-        { summary: caseInsensitiveSearch },
         { isbn: caseInsensitiveSearch },
-        { isbn13: caseInsensitiveSearch }
+        { isbn13: caseInsensitiveSearch },
+        { 'publisher.name': caseInsensitiveSearch },
+        { 'authors.name': caseInsensitiveSearch }
       ];
 
-      // @ts-ignore
-      if (!isNaN(qm.search)) {
+      if (!isNaN(Number(qm.search))) {
         orQueries.push({
           publishYear: Number(qm.search)
         });

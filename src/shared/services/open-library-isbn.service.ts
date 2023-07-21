@@ -30,7 +30,7 @@ export class OpenLibraryIsbnService {
         externalId: data.key,
         publisher: data.publishers[0],
         publishYear: new Date(data.publish_date).getFullYear(),
-        summary: data.first_sentence.value,
+        summary: data.first_sentence,
         title: data.title,
         isbn: data.isbn_10[0],
         isbn13: data.isbn_13[0],
