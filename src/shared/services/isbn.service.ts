@@ -19,12 +19,10 @@ export class IsbnService {
 
     // first try to use the google books archive
     book = await this.googleIsbnService.search(isbn);
-    console.log(book);
 
     // if book not found, try the open library service
     if (!book) {
       book = await this.openLibIsbnService.search(isbn);
-      console.log(book);
     }
 
     return book;
