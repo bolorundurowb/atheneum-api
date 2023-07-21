@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  Logger,
   NotFoundException,
   UnauthorizedException
 } from '@nestjs/common';
@@ -15,15 +16,19 @@ import { UsersService } from '../../users/services/users.service';
 import { BookManualDto } from '../dtos/book-manual.dto';
 import { BookQueryDto } from '../dtos/book-query.dto';
 import { User } from '../../users/schemas/user.schema';
+import { WishListService } from '../../wish-list/services/wish-list.service';
 
 @Injectable()
 export class BooksService {
   readonly DEFAULT_AUTHOR_NAME = 'No Author';
   readonly DEFAULT_PUBLISHER_NAME = 'No Publisher';
 
+  private readonly logger = new Logger(BooksService.name);
+
   constructor(
     private isbnService: IsbnService,
     private userService: UsersService,
+    private wishListService: WishListService,
     @InjectModel(Book.name) private bookModel: Model<BookDocument>,
     @InjectModel(Author.name) private authorModel: Model<AuthorDocument>,
     @InjectModel(Publisher.name)
@@ -125,7 +130,16 @@ export class BooksService {
         publisher: publisher
       })
     );
-    return book.save();
+    await book.save();
+
+    // remove the book from the user's wishlist
+    await this.removeAddedBookFromWishlist(
+      owner,
+      bookInfo.isbn,
+      bookInfo.isbn13
+    );
+
+    return book;
   }
 
   async addManual(ownerId: any, details: BookManualDto): Promise<Book> {
@@ -170,7 +184,14 @@ export class BooksService {
         publisher
       })
     );
-    return book.save();
+    await book.save();
+
+    // remove the book from the user's wishlist
+    if (details.isbn) {
+      await this.removeAddedBookFromWishlist(owner, details.isbn, null);
+    }
+
+    return book;
   }
 
   async borrowBook(
@@ -260,12 +281,7 @@ export class BooksService {
     isbn: string
   ): Promise<boolean> {
     const count = await this.bookModel.countDocuments({
-      $and: [
-        { owner: ownerId },
-        {
-          $or: [{ isbn }, { isbn13: isbn }]
-        }
-      ]
+      $and: [{ owner: ownerId }, { $or: [{ isbn }, { isbn13: isbn }] }]
     });
     return count > 0;
   }
@@ -317,5 +333,20 @@ export class BooksService {
     }
 
     return authors;
+  }
+
+  private async removeAddedBookFromWishlist(
+    owner: User,
+    isbn: string,
+    isbn13?: string
+  ): Promise<void> {
+    try {
+      await this.wishListService.removeByIsbn(owner._id, isbn, isbn13);
+    } catch (err) {
+      this.logger.error(
+        'An error occurred when removing an added book from the wishlist.',
+        err
+      );
+    }
   }
 }

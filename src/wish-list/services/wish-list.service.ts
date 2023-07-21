@@ -82,4 +82,17 @@ export class WishListService {
       _id: wishId
     });
   }
+
+  async removeByIsbn(
+    ownerId: any,
+    isbn: string,
+    isbn13?: string
+  ): Promise<void> {
+    await this.wishListModel.findOneAndDelete({
+      $and: [
+        { owner: ownerId },
+        { $or: [{ isbn }, { isbn13: isbn13 ?? isbn }] }
+      ]
+    });
+  }
 }
