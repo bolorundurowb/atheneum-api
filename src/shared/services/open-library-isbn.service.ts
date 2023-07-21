@@ -2,7 +2,8 @@
  * Created by bolorundurowb on 7/23/2021
  */
 
-import { HttpService, Injectable, Logger } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { Injectable, Logger } from '@nestjs/common';
 import { BookInfoDto } from '../../books/dtos/book-info.dto';
 
 @Injectable()
@@ -29,7 +30,7 @@ export class OpenLibraryIsbnService {
         externalId: data.key,
         publisher: data.publishers[0],
         publishYear: new Date(data.publish_date).getFullYear(),
-        summary: data.first_sentence.value,
+        summary: data.first_sentence,
         title: data.title,
         isbn: data.isbn_10[0],
         isbn13: data.isbn_13[0],

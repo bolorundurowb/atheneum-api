@@ -20,4 +20,12 @@ export class BookQueryDto {
   @ApiProperty()
   @IsOptional()
   available?: boolean;
+
+  @ApiProperty()
+  @IsOptional()
+  publisherId?: string;
+
+  @ApiProperty()
+  @IsOptional()
+  authorId?: string;
 }

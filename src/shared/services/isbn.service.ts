@@ -17,12 +17,12 @@ export class IsbnService {
   async getBookByIsbn(isbn: string): Promise<BookInfoDto> {
     let book;
 
-    // first try to use the open library
-    book = await this.openLibIsbnService.search(isbn);
+    // first try to use the google books archive
+    book = await this.googleIsbnService.search(isbn);
 
-    // if book not found, try the google service
+    // if book not found, try the open library service
     if (!book) {
-      book = await this.googleIsbnService.search(isbn);
+      book = await this.openLibIsbnService.search(isbn);
     }
 
     return book;
