@@ -3,7 +3,13 @@
  */
 
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumberString, IsOptional, MaxLength, MinLength } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumberString,
+  IsOptional,
+  MaxLength,
+  MinLength
+} from 'class-validator';
 
 export class BookManualDto {
   @ApiProperty()

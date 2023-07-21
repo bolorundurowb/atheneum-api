@@ -1,7 +1,6 @@
 import {
   ConflictException,
   Injectable,
-  NotFoundException,
   UnauthorizedException
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -81,6 +80,19 @@ export class WishListService {
     await this.wishListModel.findOneAndDelete({
       owner: ownerId,
       _id: wishId
+    });
+  }
+
+  async removeByIsbn(
+    ownerId: any,
+    isbn: string,
+    isbn13?: string
+  ): Promise<void> {
+    await this.wishListModel.findOneAndDelete({
+      $and: [
+        { owner: ownerId },
+        { $or: [{ isbn }, { isbn13: isbn13 ?? isbn }] }
+      ]
     });
   }
 }

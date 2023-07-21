@@ -11,12 +11,14 @@ import { PublisherService } from './services/publisher.service';
 import { AuthorService } from './services/author.service';
 import { AuthorsController } from './controllers/authors.controller';
 import { SharedModule } from '../shared/shared.module';
+import { WishListModule } from '../wish-list/wish-list.module';
 
 @Module({
   providers: [BooksService, PublisherService, AuthorService],
   controllers: [BooksController, PublishersController, AuthorsController],
   imports: [
     UsersModule,
+    WishListModule,
     SharedModule,
     MongooseModule.forFeature([
       { name: Book.name, schema: BookSchema },

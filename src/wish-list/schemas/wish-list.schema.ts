@@ -2,7 +2,6 @@
  * Created by bolorundurowb on 1/15/2021
  */
 
-
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { User } from '../../users/schemas/user.schema';
@@ -24,7 +23,10 @@ export class WishList {
   @Prop()
   isbn: string;
 
-  @Prop({ default: 'https://res.cloudinary.com/dg2dgzbt4/image/upload/v1625842121/external_assets/open_source/icons/default-book-cover.png' })
+  @Prop({
+    default:
+      'https://res.cloudinary.com/dg2dgzbt4/image/upload/v1625842121/external_assets/open_source/icons/default-book-cover.png'
+  })
   coverArt: string;
 
   @Prop({ type: String, ref: 'User' })
