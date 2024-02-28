@@ -17,6 +17,6 @@ import { StatisticsModule } from './statistics/statistics.module';
     SharedModule,
     WishListModule,
     StatisticsModule
-  ],
+  ]
 })
 export class AppModule {}

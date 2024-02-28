@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  Logger,
   NotFoundException,
   UnauthorizedException
 } from '@nestjs/common';
@@ -14,12 +15,20 @@ import { Publisher, PublisherDocument } from '../schemas/publisher.schema';
 import { UsersService } from '../../users/services/users.service';
 import { BookManualDto } from '../dtos/book-manual.dto';
 import { BookQueryDto } from '../dtos/book-query.dto';
+import { User } from '../../users/schemas/user.schema';
+import { WishListService } from '../../wish-list/services/wish-list.service';
 
 @Injectable()
 export class BooksService {
+  readonly DEFAULT_AUTHOR_NAME = 'No Author';
+  readonly DEFAULT_PUBLISHER_NAME = 'No Publisher';
+
+  private readonly logger = new Logger(BooksService.name);
+
   constructor(
     private isbnService: IsbnService,
     private userService: UsersService,
+    private wishListService: WishListService,
     @InjectModel(Book.name) private bookModel: Model<BookDocument>,
     @InjectModel(Author.name) private authorModel: Model<AuthorDocument>,
     @InjectModel(Publisher.name)
@@ -31,6 +40,14 @@ export class BooksService {
       owner: ownerId
     };
 
+    if (qm.publisherId) {
+      query.publisher = qm.publisherId;
+    }
+
+    if (qm.authorId) {
+      query.authors = qm.authorId;
+    }
+
     if (qm.search) {
       const caseInsensitiveSearch = {
         $regex: new RegExp(qm.search, 'i')
@@ -38,13 +55,13 @@ export class BooksService {
 
       const orQueries: Array<any> = [
         { title: caseInsensitiveSearch },
-        { summary: caseInsensitiveSearch },
         { isbn: caseInsensitiveSearch },
-        { isbn13: caseInsensitiveSearch }
+        { isbn13: caseInsensitiveSearch },
+        { 'publisher.name': caseInsensitiveSearch },
+        { 'authors.name': caseInsensitiveSearch }
       ];
 
-      // @ts-ignore
-      if (!isNaN(qm.search)) {
+      if (!isNaN(Number(qm.search))) {
         orQueries.push({
           publishYear: Number(qm.search)
         });
@@ -57,13 +74,33 @@ export class BooksService {
       query.isAvailable = Boolean(qm.available);
     }
 
-    return this.bookModel
-      .find(query)
-      .sort({ title: 'asc' })
-      .populate('publisher', 'name')
-      .populate('authors', 'name')
-      .skip(Number(qm.skip || 0))
-      .limit(Number(qm.limit || 30));
+    const aggregateQuery = [
+      {
+        $lookup: {
+          from: 'publishers',
+          localField: 'publisher',
+          foreignField: '_id',
+          as: 'publisher'
+        }
+      },
+      {
+        $unwind: '$publisher'
+      },
+      {
+        $lookup: {
+          from: 'authors',
+          localField: 'authors',
+          foreignField: '_id',
+          as: 'authors'
+        }
+      },
+      { $match: query },
+      { $sort: { title: 1 as any } },
+      { $skip: Number(qm.skip) },
+      { $limit: Number(qm.limit) }
+    ];
+
+    return this.bookModel.aggregate(aggregateQuery);
   }
 
   async getAllCount(ownerId: any): Promise<number> {
@@ -78,17 +115,10 @@ export class BooksService {
       throw new UnauthorizedException();
     }
 
-    // see if book exists
-    let book = await this.bookModel.findOne({
-      $and: [
-        { owner: ownerId },
-        {
-          $or: [{ isbn: isbn }, { isbn13: isbn }]
-        }
-      ]
-    });
+    // avoid isbn conflicts
+    const bookExistsWithIsbn = await this.bookExistsWithIsbn(ownerId, isbn);
 
-    if (book) {
+    if (bookExistsWithIsbn) {
       throw new ConflictException(
         null,
         'Book with same ISBN exists in your library.'
@@ -104,55 +134,32 @@ export class BooksService {
       );
     }
 
-    // find the publisher or create if they dont exist
-    const publisherName = bookInfo.publisher || 'No Publisher';
-    let publisher = await this.publisherModel.findOne({
+    // get the publisher
+    const publisher = await this.getOrCreatePublisher(
       owner,
-      name: {
-        $regex: publisherName,
-        $options: 'i'
-      }
-    });
+      bookInfo.publisher
+    );
 
-    if (!publisher) {
-      publisher = new this.publisherModel({
+    // get the authors
+    const authors = await this.getOrCreateAuthors(owner, bookInfo.authors);
+
+    const book = new this.bookModel(
+      Object.assign(bookInfo, {
         owner,
-        name: publisherName
-      });
-      await publisher.save();
-    }
+        authors: authors,
+        publisher: publisher
+      })
+    );
+    await book.save();
 
-    // find the authors or create if they dont exist
-    const authors = [];
-
-    for (const authorName of bookInfo.authors) {
-      let author = await this.authorModel.findOne({
-        owner,
-        name: {
-          $regex: authorName,
-          $options: 'i'
-        }
-      });
-
-      if (!author) {
-        author = new this.authorModel({
-          owner,
-          name: authorName
-        });
-        await author.save();
-      }
-
-      authors.push(author);
-    }
-
-    const model = Object.assign(bookInfo, {
+    // remove the book from the user's wishlist
+    await this.removeAddedBookFromWishlist(
       owner,
-      authors: authors,
-      publisher: publisher
-    });
+      bookInfo.isbn,
+      bookInfo.isbn13
+    );
 
-    book = new this.bookModel(model);
-    return book.save();
+    return book;
   }
 
   async addManual(ownerId: any, details: BookManualDto): Promise<Book> {
@@ -165,16 +172,13 @@ export class BooksService {
 
     // if an isbn is provided
     if (details.isbn) {
-      const book = await this.bookModel.findOne({
-        $and: [
-          { owner: ownerId },
-          {
-            $or: [{ isbn: details.isbn }, { isbn13: details.isbn }]
-          }
-        ]
-      });
+      // avoid isbn conflicts
+      const bookExistsWithIsbn = await this.bookExistsWithIsbn(
+        ownerId,
+        details.isbn
+      );
 
-      if (book) {
+      if (bookExistsWithIsbn) {
         throw new ConflictException(
           null,
           'Book with same ISBN exists in your library.'
@@ -182,47 +186,14 @@ export class BooksService {
       }
     }
 
-    // find the publisher or create if they dont exist
-    const publisherName = details.publisher || 'No Publisher';
-    let publisher = await this.publisherModel.findOne({
+    // get the publisher
+    const publisher = await this.getOrCreatePublisher(owner, details.publisher);
+
+    // get the authors
+    const authors = await this.getOrCreateAuthors(
       owner,
-      name: {
-        $regex: publisherName,
-        $options: 'i'
-      }
-    });
-
-    if (!publisher) {
-      publisher = new this.publisherModel({
-        owner,
-        name: publisherName
-      });
-      await publisher.save();
-    }
-
-    // find the authors and exit if they dont exist
-    details.authors = details.authors || 'No Author';
-    const authors = [];
-
-    for (const authorName of details.authors.split(',')) {
-      let author = await this.authorModel.findOne({
-        owner,
-        name: {
-          $regex: authorName,
-          $options: 'i'
-        }
-      });
-
-      if (!author) {
-        author = new this.authorModel({
-          owner,
-          name: authorName
-        });
-        await author.save();
-      }
-
-      authors.push(author);
-    }
+      details.authors?.split(',') || []
+    );
 
     const book = new this.bookModel(
       Object.assign(details, {
@@ -233,7 +204,14 @@ export class BooksService {
         publisher
       })
     );
-    return book.save();
+    await book.save();
+
+    // remove the book from the user's wishlist
+    if (details.isbn) {
+      await this.removeAddedBookFromWishlist(owner, details.isbn, null);
+    }
+
+    return book;
   }
 
   async borrowBook(
@@ -316,5 +294,79 @@ export class BooksService {
       owner: ownerId,
       _id: bookId
     });
+  }
+
+  private async bookExistsWithIsbn(
+    ownerId: string,
+    isbn: string
+  ): Promise<boolean> {
+    const count = await this.bookModel.countDocuments({
+      $and: [{ owner: ownerId }, { $or: [{ isbn }, { isbn13: isbn }] }]
+    });
+    return count > 0;
+  }
+
+  private async getOrCreatePublisher(owner: User, name?: string) {
+    const publisherName = name?.trim() || this.DEFAULT_PUBLISHER_NAME;
+    let publisher = await this.publisherModel.findOne({
+      owner,
+      name: {
+        $regex: publisherName,
+        $options: 'i'
+      }
+    });
+
+    if (!publisher) {
+      publisher = new this.publisherModel({
+        owner,
+        name: publisherName
+      });
+      await publisher.save();
+    }
+
+    return publisher;
+  }
+
+  private async getOrCreateAuthors(owner: User, names: string[]) {
+    const authorNames = names.length > 0 ? names : [this.DEFAULT_AUTHOR_NAME];
+    const authors = [];
+
+    for (let authorName of authorNames) {
+      authorName = authorName.trim();
+      let author = await this.authorModel.findOne({
+        owner,
+        name: {
+          $regex: authorName,
+          $options: 'i'
+        }
+      });
+
+      if (!author) {
+        author = new this.authorModel({
+          owner,
+          name: authorName
+        });
+        await author.save();
+      }
+
+      authors.push(author);
+    }
+
+    return authors;
+  }
+
+  private async removeAddedBookFromWishlist(
+    owner: User,
+    isbn: string,
+    isbn13?: string
+  ): Promise<void> {
+    try {
+      await this.wishListService.removeByIsbn(owner._id, isbn, isbn13);
+    } catch (err) {
+      this.logger.error(
+        'An error occurred when removing an added book from the wishlist.',
+        err
+      );
+    }
   }
 }

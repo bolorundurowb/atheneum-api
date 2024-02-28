@@ -2,7 +2,8 @@
  * Created by bolorundurowb on 6/19/2021
  */
 
-import { HttpModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { EmailService } from './services/email.service';
 import { CodeService } from './services/code.service';
 import { TemplateService } from './services/template.service';

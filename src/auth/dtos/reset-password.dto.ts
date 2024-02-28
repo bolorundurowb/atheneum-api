@@ -4,7 +4,7 @@ import { IsEmail, IsNotEmpty, IsNumberString, IsString } from 'class-validator';
 /**
  * Created by bolorundurowb on 6/20/2021
  */
-  
+
 export class ResetPasswordDto {
   @ApiProperty()
   @IsString()
