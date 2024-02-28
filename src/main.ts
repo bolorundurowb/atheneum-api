@@ -7,6 +7,9 @@ import configuration from './config/configuration';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // configure CORS
+  app.enableCors();
+
   // configure swagger
   const options = new DocumentBuilder()
     .setTitle('Atheneum API')
@@ -22,4 +25,4 @@ async function bootstrap() {
   await app.listen(configuration().port);
 }
 
-bootstrap();
+bootstrap().then(() => console.log('API bootstrapped'));
