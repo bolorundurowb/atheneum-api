@@ -28,15 +28,8 @@ export class AuthService {
   async login(emailAddress: string, password: string): Promise<AuthDto> {
     const user = await this.userService.findByEmail(emailAddress);
 
-    if (!user) {
-      throw new UnauthorizedException(
-        null,
-        'An account does not exist with that email address.'
-      );
-    }
-
-    if (!bcrypt.compareSync(password, user.passwordHash)) {
-      throw new UnauthorizedException(null, 'Wrong password.');
+    if (!user || !bcrypt.compareSync(password, user.passwordHash)) {
+      throw new UnauthorizedException(null, 'Invalid credentials');
     }
 
     return {
@@ -96,20 +89,22 @@ export class AuthService {
   async forgotPassword(emailAddress: string): Promise<void> {
     const user = await this.userService.findByEmail(emailAddress);
 
-    if (!user) {
-      throw new NotFoundException(null, 'User account not found.');
+    if (user) {
+      const resetCode = this.codeService.generateResetCode();
+      user.resetCode = resetCode;
+      await (<UserDocument>user).save();
+
+      // send an email to the user
+      const content = this.templateService.getForgotPasswordContent(
+        user.firstName,
+        resetCode
+      );
+      await this.emailService.send(
+        user.emailAddress,
+        'Your reset code',
+        content
+      );
     }
-
-    const resetCode = this.codeService.generateResetCode();
-    user.resetCode = resetCode;
-    await (<UserDocument>user).save();
-
-    // send an email to the user
-    const content = this.templateService.getForgotPasswordContent(
-      user.firstName,
-      resetCode
-    );
-    await this.emailService.send(user.emailAddress, 'Your reset code', content);
   }
 
   async resetPassword(
@@ -150,7 +145,7 @@ export class AuthService {
     }
 
     if (user.verificationCode !== verificationCode) {
-      throw new BadRequestException(null, 'Reset code does not match.');
+      throw new BadRequestException(null, 'Invalid reset code');
     }
 
     user.isEmailVerified = true;

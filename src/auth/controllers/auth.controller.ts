@@ -59,9 +59,6 @@ export class AuthController {
     description: 'Password reset email dispatched',
     type: MessageDto
   })
-  @ApiNotFoundResponse({
-    description: 'A user account does not exist for the provided email'
-  })
   async forgotPassword(
     @Body() payload: ForgotPasswordDto
   ): Promise<MessageDto> {
