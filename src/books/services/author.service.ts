@@ -35,7 +35,7 @@ export class AuthorService {
       { $unwind: '$authors' },
       { $group: { _id: '$authors', numOfBooks: { $sum: 1 } } },
       { $sort: { numOfBooks: -1 } },
-      { $limit: 5 }
+      { $limit: 6 }
     ]);
 
     const populatedResult = await this.authorModel.populate(result, {

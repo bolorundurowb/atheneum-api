@@ -286,7 +286,7 @@ export class BooksService {
       .populate('authors', 'name')
       .populate('publisher', 'name')
       .sort({ createdAt: 'desc' })
-      .limit(5);
+      .limit(6);
   }
 
   async remove(ownerId: any, bookId: any): Promise<void> {

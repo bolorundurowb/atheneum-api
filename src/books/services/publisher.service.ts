@@ -34,7 +34,7 @@ export class PublisherService {
       { $match: { owner: ownerId } },
       { $group: { _id: '$publisher', numOfBooks: { $sum: 1 } } },
       { $sort: { numOfBooks: -1 } },
-      { $limit: 5 }
+      { $limit: 6 }
     ]);
 
     const populatedResult = await this.publisherModel.populate(result, {
