@@ -49,7 +49,6 @@ export class BooksController {
   @Post('isbn')
   async createFromIsbn(@Request() req, @Body() payload: BookIsbnDto) {
     const userId = req.user.id;
-    console.log('***********', payload);
     return this.bookService.addByIsbn(userId, payload.isbn);
   }
 
