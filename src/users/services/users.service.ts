@@ -63,4 +63,8 @@ export class UsersService {
     user.passwordHash = newPassword;
     await (<UserDocument>user).save();
   }
+
+  async removeAccount(userId: string): Promise<void> {
+    await this.userModel.findByIdAndRemove(userId);
+  }
 }
