@@ -1,16 +1,10 @@
-import { Body, Controller, Delete, Get, Put, Request, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Request, UseGuards } from '@nestjs/common';
 import {
-  ApiBadRequestResponse,
-  ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { UserProfileDto } from '../dtos/user-profile.dto';
-import { UsersService } from '../services/users.service';
-import { PasswordUpdateDto } from '../dtos/password-update.dto';
-import { MessageDto } from '../../auth/dtos/message.dto';
-import { User } from '../schemas/user.schema';
+import { UsersService } from '../../users/services/users.service';
 import { BooksService } from '../../books/services/books.service';
 import { PublisherService } from '../../books/services/publisher.service';
 import { AuthorService } from '../../books/services/author.service';
