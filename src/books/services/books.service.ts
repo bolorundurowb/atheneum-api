@@ -296,6 +296,13 @@ export class BooksService {
     });
   }
 
+  async removeOwned(ownerId: any): Promise<void> {
+    const books = await this.bookModel.find({ owner: ownerId });
+    await Promise.all(
+      books.map((x) => this.bookModel.findByIdAndRemove(x._id))
+    );
+  }
+
   private async bookExistsWithIsbn(
     ownerId: string,
     isbn: string

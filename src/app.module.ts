@@ -7,11 +7,13 @@ import { WishListModule } from './wish-list/wish-list.module';
 import configuration from './config/configuration';
 import { SharedModule } from './shared/shared.module';
 import { StatisticsModule } from './statistics/statistics.module';
+import { AccountsModule } from './accounts/accounts.module';
 
 @Module({
   imports: [
     MongooseModule.forRoot(configuration().database.url),
     AuthModule,
+    AccountsModule,
     UsersModule,
     BooksModule,
     SharedModule,
